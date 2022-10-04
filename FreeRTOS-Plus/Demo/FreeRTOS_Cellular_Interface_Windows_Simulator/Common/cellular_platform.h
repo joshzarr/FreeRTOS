@@ -65,7 +65,7 @@ extern void vLoggingPrintf( const char * pcFormatString,
 #endif
 
 #ifndef LIBRARY_LOG_LEVEL
-    #define LIBRARY_LOG_LEVEL    LOG_ERROR
+    #define LIBRARY_LOG_LEVEL    LOG_WARN
 #endif
 #include "logging_stack.h"
 

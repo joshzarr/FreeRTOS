@@ -81,7 +81,7 @@ static bool prIotMutexTimedLock( PlatformMutex_t * pMutex,
 
     configASSERT( pMutex != NULL );
 
-    LogInfo( ( "Locking mutex %p.", pMutex ) );
+    LogWarn( ( "Locking mutex %p.", pMutex ) );
 
     /* Call the correct FreeRTOS mutex take function based on mutex type. */
     if( pMutex->recursive == pdTRUE )
@@ -218,7 +218,7 @@ void PlatformMutex_Unlock( PlatformMutex_t * pMutex )
 {
     configASSERT( pMutex != NULL );
 
-    LogInfo( ( "Unlocking mutex %p.", pMutex ) );
+    LogWarn( ( "Unlocking mutex %p.", pMutex ) );
 
     /* Call the correct FreeRTOS mutex unlock function based on mutex type. */
     if( pMutex->recursive == pdTRUE )
