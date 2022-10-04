@@ -51,7 +51,7 @@
 #endif
 
 #ifndef LIBRARY_LOG_LEVEL
-    #define LIBRARY_LOG_LEVEL    LOG_DEBUG
+    #define LIBRARY_LOG_LEVEL    LOG_INFO
 #endif
 
 /* Prototype for the function used to print to console on Windows simulator
