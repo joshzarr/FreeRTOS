@@ -200,10 +200,12 @@ void PlatformMutex_Destroy( PlatformMutex_t * pMutex )
 
 /*-----------------------------------------------------------*/
 
+#if 0
 void PlatformMutex_Lock( PlatformMutex_t * pMutex )
 {
     prIotMutexTimedLock( pMutex, portMAX_DELAY );
 }
+#endif
 
 /*-----------------------------------------------------------*/
 
