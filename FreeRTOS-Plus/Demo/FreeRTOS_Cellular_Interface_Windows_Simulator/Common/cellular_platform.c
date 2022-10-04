@@ -56,10 +56,8 @@ static void prvThreadRoutineWrapper( void * pArgument );
  *
  * @return true if mutex is locked successfully. Otherwise false.
  */
-#if 0
 static bool prIotMutexTimedLock( PlatformMutex_t * pMutex,
                                  TickType_t timeout );
-#endif
 
 /*-----------------------------------------------------------*/
 
@@ -76,7 +74,7 @@ static void prvThreadRoutineWrapper( void * pArgument )
 
 /*-----------------------------------------------------------*/
 
-bool prIotMutexTimedLock( PlatformMutex_t * pMutex,
+static bool prIotMutexTimedLock( PlatformMutex_t * pMutex,
                                  TickType_t timeout )
 {
     BaseType_t lockResult = pdTRUE;
@@ -202,12 +200,10 @@ void PlatformMutex_Destroy( PlatformMutex_t * pMutex )
 
 /*-----------------------------------------------------------*/
 
-#if 0
 void PlatformMutex_Lock( PlatformMutex_t * pMutex )
 {
     prIotMutexTimedLock( pMutex, portMAX_DELAY );
 }
-#endif
 
 /*-----------------------------------------------------------*/
 
@@ -218,7 +214,7 @@ bool PlatformMutex_TryLock( PlatformMutex_t * pMutex )
 
 /*-----------------------------------------------------------*/
 
-void prvIotMutexUnlock( PlatformMutex_t * pMutex )
+void PlatformMutex_Unlock( PlatformMutex_t * pMutex )
 {
     configASSERT( pMutex != NULL );
 

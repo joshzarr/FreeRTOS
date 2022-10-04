@@ -65,7 +65,7 @@ extern void vLoggingPrintf( const char * pcFormatString,
 #endif
 
 #ifndef LIBRARY_LOG_LEVEL
-    #define LIBRARY_LOG_LEVEL    LOG_WARN
+    #define LIBRARY_LOG_LEVEL    LOG_ERROR
 #endif
 #include "logging_stack.h"
 
@@ -113,24 +113,9 @@ typedef struct PlatformMutex
 bool PlatformMutex_Create( PlatformMutex_t * pNewMutex,
                            bool recursive );
 void PlatformMutex_Destroy( PlatformMutex_t * pMutex );
-// void PlatformMutex_Lock( PlatformMutex_t * pMutex );
+void PlatformMutex_Lock( PlatformMutex_t * pMutex );
 bool PlatformMutex_TryLock( PlatformMutex_t * pMutex );
-// void PlatformMutex_Unlock( PlatformMutex_t * pMutex );
-void prvIotMutexUnlock( PlatformMutex_t * pMutex );
-bool prIotMutexTimedLock( PlatformMutex_t * pMutex, TickType_t timeout );
-#define PlatformMutex_Lock( pMutex ) \
-do \
-{ \
-    LogError( ( "%s:%d", __FUNCTION__, __LINE__ ) ); \
-    prIotMutexTimedLock( pMutex, portMAX_DELAY ); \
-} while( 0 )
-
-#define PlatformMutex_Unlock( pMutex ) \
-do \
-{ \
-    LogError( ( "%s:%d", __FUNCTION__, __LINE__ ) ); \
-    prvIotMutexUnlock( pMutex ); \
-} while( 0 )
+void PlatformMutex_Unlock( PlatformMutex_t * pMutex );
 
 /*-----------------------------------------------------------*/
 
