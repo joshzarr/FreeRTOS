@@ -118,11 +118,11 @@ bool PlatformMutex_TryLock( PlatformMutex_t * pMutex );
 // void PlatformMutex_Unlock( PlatformMutex_t * pMutex );
 void prvIotMutexUnlock( PlatformMutex_t * pMutex );
 bool prIotMutexTimedLock( PlatformMutex_t * pMutex, TickType_t timeout );
-#define PlatformMutex_Lock( pMutex, timeout ) \
+#define PlatformMutex_Lock( pMutex ) \
 do \
 { \
     LogError( ( "%s:%d", __FUNCTION__, __LINE__ ) ); \
-    prIotMutexTimedLock( pMutex, timeout ); \
+    prIotMutexTimedLock( pMutex, portMAX_DELAY ); \
 } while( 0 )
 
 #define PlatformMutex_Unlock( pMutex ) \
