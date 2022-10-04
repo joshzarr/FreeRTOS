@@ -113,9 +113,24 @@ typedef struct PlatformMutex
 bool PlatformMutex_Create( PlatformMutex_t * pNewMutex,
                            bool recursive );
 void PlatformMutex_Destroy( PlatformMutex_t * pMutex );
-void PlatformMutex_Lock( PlatformMutex_t * pMutex );
+// void PlatformMutex_Lock( PlatformMutex_t * pMutex );
 bool PlatformMutex_TryLock( PlatformMutex_t * pMutex );
-void PlatformMutex_Unlock( PlatformMutex_t * pMutex );
+// void PlatformMutex_Unlock( PlatformMutex_t * pMutex );
+void prvIotMutexUnlock( PlatformMutex_t * pMutex );
+bool prIotMutexTimedLock( PlatformMutex_t * pMutex, TickType_t timeout );
+#define PlatformMutex_Lock( pMutex, timeout ) \
+do \
+{ \
+    LogError( ( "%s:%d", __FUNCTION__, __LINE__ ) ); \
+    prIotMutexTimedLock( pMutex, timeout ); \
+} while( 0 )
+
+#define PlatformMutex_Unlock( pMutex ) \
+do \
+{ \
+    LogError( ( "%s:%d", __FUNCTION__, __LINE__ ) ); \
+    prvIotMutexUnlock( pMutex ); \
+} while( 0 )
 
 /*-----------------------------------------------------------*/
 
