@@ -124,7 +124,7 @@ void test_priority_verification_tasks_equal_priority( void )
  * @brief AWS_IoT-FreeRTOS_SMP_TC-2
  * The purpose of this test is to verify when multiple CPU cores are available and 
  * the FreeRTOS kernel is configured as (configRUN_MULTIPLE_PRIORITIES = 0) that 
- * tasks of different priorities will execute simultaneously. The kernel will be 
+ * tasks of different priorities will not execute simultaneously. The kernel will be
  * configured as follows:
  * 
  * #define configRUN_MULTIPLE_PRIORITIES                    0
@@ -181,7 +181,7 @@ void test_priority_verification_tasks_different_priorities( void )
  * task is no longer running.
  * 
  * #define configRUN_MULTIPLE_PRIORITIES                    0
- * #define configNUM_CORES                                  2
+ * #define configUSE_TIME_SLICING                           0
  * #define configNUM_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores
@@ -201,7 +201,7 @@ void test_priority_verification_tasks_different_priorities( void )
  * 
  * After calling vTaskPrioritySet() and lowering the priority of task T1
  * 
- * Task (T1)	   Task (T2)
+ * Task (T1)	   Task (TN)
  * Priority – 1    Priority – 2
  * State - Ready   State - Running (Core N)
 */
@@ -249,7 +249,7 @@ void test_priority_change_tasks_equal_priority_lower( void )
  * shall remain running and all other tasks will enter the ready state.
  * 
  * #define configRUN_MULTIPLE_PRIORITIES                    0
- * #define configNUM_CORES                                  2
+ * #define configUSE_TIME_SLICING                           0
  * #define configNUM_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores
@@ -318,7 +318,7 @@ void test_priority_change_tasks_equal_priority_raise( void )
  * will then be raised to high priority and enter the running state.
  * 
  * #define configRUN_MULTIPLE_PRIORITIES                    0
- * #define configNUM_CORES                                  2
+ * #define configUSE_TIME_SLICING                           0
  * #define configNUM_CORES                                  (N > 1)
  *
  * This test can be run with FreeRTOS configured for any number of cores greater
@@ -391,7 +391,7 @@ void test_priority_change_tasks_different_priority_raise( void )
  * state.
  * 
  * #define configRUN_MULTIPLE_PRIORITIES                    0
- * #define configNUM_CORES                                  2
+ * #define configUSE_TIME_SLICING                           0
  * #define configNUM_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores greater
@@ -475,7 +475,7 @@ void test_priority_change_tasks_different_priority_lower( void )
  * running state.
  * 
  * #define configRUN_MULTIPLE_PRIORITIES                    0
- * #define configNUM_CORES                                  2
+ * #define configUSE_TIME_SLICING                           0
  * #define configNUM_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores
@@ -535,7 +535,7 @@ void test_task_create_tasks_equal_priority( void )
  * ready state.
  * 
  * #define configRUN_MULTIPLE_PRIORITIES                    0
- * #define configNUM_CORES                                  2
+ * #define configUSE_TIME_SLICING                           0
  * #define configNUM_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores
@@ -595,7 +595,7 @@ void test_task_create_tasks_lower_priority( void )
  * running state.
  * 
  * #define configRUN_MULTIPLE_PRIORITIES                    0
- * #define configNUM_CORES                                  2
+ * #define configUSE_TIME_SLICING                           0
  * #define configNUM_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores
@@ -711,7 +711,7 @@ void test_task_create_tasks_higher_priority( void )
  * be in the ready state.
  * 
  * #define configRUN_MULTIPLE_PRIORITIES                    0
- * #define configNUM_CORES                                  2
+ * #define configUSE_TIME_SLICING                           0
  * #define configNUM_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores
@@ -771,7 +771,7 @@ void test_task_create_all_cores_equal_priority_equal( void )
  * be in the ready state.
  * 
  * #define configRUN_MULTIPLE_PRIORITIES                    0
- * #define configNUM_CORES                                  2
+ * #define configUSE_TIME_SLICING                           0
  * #define configNUM_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores
@@ -831,7 +831,7 @@ void test_task_create_all_cores_equal_priority_lower( void )
  * be in the running state and all other tasks will now be in the ready state.
  * 
  * #define configRUN_MULTIPLE_PRIORITIES                    0
- * #define configNUM_CORES                                  2
+ * #define configUSE_TIME_SLICING                           0
  * #define configNUM_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores
@@ -925,7 +925,7 @@ void test_task_create_all_cores_equal_priority_higher( void )
  * state.
  * 
  * #define configRUN_MULTIPLE_PRIORITIES                    0
- * #define configNUM_CORES                                  2
+ * #define configUSE_TIME_SLICING                           0
  * #define configNUM_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores
@@ -949,7 +949,7 @@ void test_task_create_all_cores_equal_priority_higher( void )
  * Priority – 2               Priority – 1   Priority – 2
  * State - Running (Core 0)	  State - Ready  State - Running (Core 1)
  */ 
-void test_task_create_all_cores_equal_priority_high( void )
+void test_task_create_all_cores_different_priority_high( void )
 {
     TaskHandle_t xTaskHandles[configNUM_CORES + 1] = { NULL };
     uint32_t i;
@@ -995,7 +995,7 @@ void test_task_create_all_cores_equal_priority_high( void )
  * original low priority tasks will also remain in the ready state.
  * 
  * #define configRUN_MULTIPLE_PRIORITIES                    0
- * #define configNUM_CORES                                  2
+ * #define configUSE_TIME_SLICING                           0
  * #define configNUM_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores
@@ -1019,7 +1019,7 @@ void test_task_create_all_cores_equal_priority_high( void )
  * Priority – 2               Priority – 1   Priority – 1
  * State - Running (Core 0)	  State - Ready  State - Ready
  */ 
-void test_task_create_all_cores_equal_priority_low( void )
+void test_task_create_all_cores_different_priority_low( void )
 {
     TaskHandle_t xTaskHandles[configNUM_CORES + 1] = { NULL };
     uint32_t i;
@@ -1064,7 +1064,7 @@ void test_task_create_all_cores_equal_priority_low( void )
  * in the running state.
  * 
  * #define configRUN_MULTIPLE_PRIORITIES                    0
- * #define configNUM_CORES                                  2
+ * #define configUSE_TIME_SLICING                           0
  * #define configNUM_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores
@@ -1207,7 +1207,7 @@ void test_task_delete_tasks_different_priorities_delete_low( void )
  * will then be deleted.
  * 
  * #define configRUN_MULTIPLE_PRIORITIES                    0
- * #define configNUM_CORES                                  2
+ * #define configUSE_TIME_SLICING                           0
  * #define configNUM_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores 
@@ -1280,7 +1280,7 @@ void test_task_delete_tasks_different_priorities_delete_high( void )
  * verify when a task is deleted the idle task will begin running.
  * 
  * #define configRUN_MULTIPLE_PRIORITIES                    0
- * #define configNUM_CORES                                  2
+ * #define configUSE_TIME_SLICING                           0
  * #define configNUM_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores
@@ -1351,7 +1351,7 @@ void test_task_delete_tasks_equal_priority_delete_running( void )
  * will remain in the ready state.
  * 
  * #define configRUN_MULTIPLE_PRIORITIES                    0
- * #define configNUM_CORES                                  2
+ * #define configUSE_TIME_SLICING                           0
  * #define configNUM_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores
@@ -1428,7 +1428,7 @@ void test_task_delete_all_cores_high_priority_delete_high_priority_task( void )
  * the idle task.
  * 
  * #define configRUN_MULTIPLE_PRIORITIES                    0
- * #define configNUM_CORES                                  2
+ * #define configUSE_TIME_SLICING                           0
  * #define configNUM_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores
@@ -1507,7 +1507,7 @@ void test_task_suspend_all_cores_equal_priority( void )
  * priority task will return to the ready state.
  * 
  * #define configRUN_MULTIPLE_PRIORITIES                    0
- * #define configNUM_CORES                                  2
+ * #define configUSE_TIME_SLICING                           0
  * #define configNUM_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores
@@ -1654,7 +1654,7 @@ void test_task_suspend_all_cores_different_priority_suspend_high( void )
  * in the running state.
  * 
  * #define configRUN_MULTIPLE_PRIORITIES                    0
- * #define configNUM_CORES                                  2
+ * #define configUSE_TIME_SLICING                           0
  * #define configNUM_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores
@@ -1728,7 +1728,7 @@ void test_task_suspend_all_cores_different_priority_suspend_low( void )
         /* Verify T0 remains running on core 0 */
         verifySmpTask( &xTaskHandles[0], eRunning, 0 );
 
-        /* Verify task T[i] is in the deleted state */
+        /* Verify task T[i] is in the suspended state */
         verifySmpTask( &xTaskHandles[i], eReady, -1 );
     }
 }
@@ -1741,7 +1741,7 @@ void test_task_suspend_all_cores_different_priority_suspend_low( void )
  * the ready state.
  * 
  * #define configRUN_MULTIPLE_PRIORITIES                    0
- * #define configNUM_CORES                                  2
+ * #define configUSE_TIME_SLICING                           0
  * #define configNUM_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores
@@ -1826,7 +1826,7 @@ void test_task_suspend_all_cores_high_priority_suspend( void )
  * ready state.
  * 
  * #define configRUN_MULTIPLE_PRIORITIES                    0
- * #define configNUM_CORES                                  2
+ * #define configUSE_TIME_SLICING                           0
  * #define configNUM_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores
@@ -1896,7 +1896,7 @@ void test_task_suspend_all_cores_equal_priority_suspend_running ( void )
  * the idle task.
  * 
  * #define configRUN_MULTIPLE_PRIORITIES                    0
- * #define configNUM_CORES                                  2
+ * #define configUSE_TIME_SLICING                           0
  * #define configNUM_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores
@@ -1975,7 +1975,7 @@ void test_task_blocked_all_cores_equal_priority( void )
  * priority task will return to the ready state.
  * 
  * #define configRUN_MULTIPLE_PRIORITIES                    0
- * #define configNUM_CORES                                  2
+ * #define configUSE_TIME_SLICING                           0
  * #define configNUM_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores
@@ -2091,7 +2091,7 @@ void test_task_blocked_all_cores_different_priority_block_high( void )
  * the ready state.
  * 
  * #define configRUN_MULTIPLE_PRIORITIES                    0
- * #define configNUM_CORES                                  2
+ * #define configUSE_TIME_SLICING                           0
  * #define configNUM_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores
@@ -2121,7 +2121,7 @@ void test_task_blocked_all_cores_different_priority_block_high( void )
  * Priority – 2              Priority – 1
  * State - Running (Core 0)	 State - Ready
  */
-void test_task_block_all_cores_high_priority_suspend( void )
+void test_task_block_all_cores_high_priority_block( void )
 {
     TaskHandle_t xTaskHandles[configNUM_CORES + 1] = { NULL };
     uint32_t i;
@@ -2176,7 +2176,7 @@ void test_task_block_all_cores_high_priority_suspend( void )
  * ready state.
  * 
  * #define configRUN_MULTIPLE_PRIORITIES                    0
- * #define configNUM_CORES                                  2
+ * #define configUSE_TIME_SLICING                           0
  * #define configNUM_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores
@@ -2206,7 +2206,7 @@ void test_task_block_all_cores_high_priority_suspend( void )
  * Priority – 2    Priority – 1
  * State - Ready   State - Running (Core 0)
  */
-void test_task_block_all_cores_equal_priority_suspend_running ( void )
+void test_task_block_all_cores_equal_priority_block_running ( void )
 {
     TaskHandle_t xTaskHandles[configNUM_CORES + 1] = { NULL };
     uint32_t i;

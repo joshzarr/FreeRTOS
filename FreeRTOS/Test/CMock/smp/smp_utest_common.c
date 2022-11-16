@@ -108,7 +108,7 @@ BaseType_t xPortStartScheduler( void )
 
     /* Initialize each core with a task */
     for (i = 0; i < configNUM_CORES; i++) {
-        vTaskSwitchContextForCore(i);
+        vTaskSwitchContext(i);
     }
 
     return pdTRUE;
@@ -143,14 +143,14 @@ void vFakePortYieldCoreStubCallback( int xCoreID, int cmock_num_calls )
     } else {
         /* No task is in the critical section. We can yield this core. */
         xCurrentCoreId = xCoreID;
-        vTaskSwitchContextForCore( xCurrentCoreId );
+        vTaskSwitchContext( xCurrentCoreId );
         xCurrentCoreId = xPreviousCoreId;
     }
 }
 
 void vFakePortYieldStubCallback( int cmock_num_calls )
 {
-    vTaskSwitchContextForCore( xCurrentCoreId );
+    vTaskSwitchContext( xCurrentCoreId );
 }
 
 void vFakePortEnterCriticalSection( void )
@@ -187,7 +187,7 @@ static void vYieldCores( void )
         {
             xCurrentCoreId = i;
             xCoreYields[ i ] = pdFALSE;
-            vTaskSwitchContextForCore( i );
+            vTaskSwitchContext( i );
         }
     }
     xCurrentCoreId = xPreviousCoreId;
