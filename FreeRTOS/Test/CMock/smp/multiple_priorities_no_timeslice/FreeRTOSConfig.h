@@ -43,7 +43,7 @@
 
 /* SMP test specific configuration */
 #define configRUN_MULTIPLE_PRIORITIES                    1
-#define configNUM_CORES                                  16
+#define configNUMBER_OF_CORES                                  16
 #define configUSE_CORE_AFFINITY                          1
 #define configUSE_TIME_SLICING                           0
 #define configUSE_TASK_PREEMPTION_DISABLE                1
@@ -152,5 +152,8 @@ void vConfigureTimerForRunTimeStats( void );    /* Prototype of function that in
     extern void vGenerateCoreBInterrupt( void * xUpdatedMessageBuffer );
     #define sbSEND_COMPLETED( pxStreamBuffer )    vGenerateCoreBInterrupt( pxStreamBuffer )
 #endif /* configINCLUDE_MESSAGE_BUFFER_AMP_DEMO */
+
+#define portENTER_CRITICAL_FROM_ISR()       ( 0 )
+#define portEXIT_CRITICAL_FROM_ISR( x )     do{ ( void )( x ); }while( 0 )
 
 #endif /* FREERTOS_CONFIG_H */

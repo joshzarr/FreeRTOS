@@ -88,7 +88,7 @@ int suiteTearDown( int numFailures )
  * #define configRUN_MULTIPLE_PRIORITIES                    0
  * #define configUSE_TIME_SLICING                           1
  * #define configUSE_CORE_AFFINITY                          1
- * #define configNUM_CORES                                  (N > 1)
+ * #define configNUMBER_OF_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores greater than 1 .
  * 
@@ -107,7 +107,7 @@ int suiteTearDown( int numFailures )
  * Call xTaskIncrementTick() for each configured CPU core. The kernel will consider CPU 0
  * the core calling the API and therefore will not rotate tasks for that CPU.
  * 
- * Task (TN + 1) when configNUM_CORES = 4
+ * Task (TN + 1) when configNUMBER_OF_CORES = 4
  * Tick    Core
  * 1       1
  * 2       2
@@ -116,39 +116,39 @@ int suiteTearDown( int numFailures )
  */
 void test_timeslice_verification_tasks_equal_priority( void )
 {
-    TaskHandle_t xTaskHandles[configNUM_CORES + 1] = { NULL };
+    TaskHandle_t xTaskHandles[configNUMBER_OF_CORES + 1] = { NULL };
     uint32_t i;
 
-    /* Create configNUM_CORES + 1 tasks of equal priority */
-    for (i = 0; i < (configNUM_CORES + 1); i++) {
+    /* Create configNUMBER_OF_CORES + 1 tasks of equal priority */
+    for (i = 0; i < (configNUMBER_OF_CORES + 1); i++) {
         xTaskCreate( vSmpTestTask, "SMP Task", configMINIMAL_STACK_SIZE, NULL, 1, &xTaskHandles[i] );
     }
     
     vTaskStartScheduler();
 
-    /* Verify all configNUM_CORES tasks are in the running state */
-    for (i = 0; i < configNUM_CORES; i++) {
+    /* Verify all configNUMBER_OF_CORES tasks are in the running state */
+    for (i = 0; i < configNUMBER_OF_CORES; i++) {
         verifySmpTask( &xTaskHandles[i], eRunning, i );
     }
 
     /* Verify the last task is in the ready state */
     verifySmpTask( &xTaskHandles[i], eReady, -1 );
 
-    /* Generate a tick for each configNUM_CORES. This will cause each
+    /* Generate a tick for each configNUMBER_OF_CORES. This will cause each
        task to be either moved to the ready state or the running state */
-    for (i = 0; i < configNUM_CORES; i++) {
+    for (i = 0; i < configNUMBER_OF_CORES; i++) {
         
         xTaskIncrementTick();
 
         int32_t core = i + 1;
 
         /* Track wrap around to the ready state */
-        if (core == configNUM_CORES) {
+        if (core == configNUMBER_OF_CORES) {
             core = -1;
         }
 
         /* Verify the last created task runs on each core or enters the ready state */
-        verifySmpTask( &xTaskHandles[configNUM_CORES], (core == -1) ? eReady : eRunning, core );
+        verifySmpTask( &xTaskHandles[configNUMBER_OF_CORES], (core == -1) ? eReady : eRunning, core );
     }
 }
 
@@ -162,7 +162,7 @@ void test_timeslice_verification_tasks_equal_priority( void )
  * #define configRUN_MULTIPLE_PRIORITIES                    0
  * #define configUSE_TIME_SLICING                           1
  * #define configUSE_CORE_AFFINITY                          1
- * #define configNUM_CORES                                  (N > 1)
+ * #define configNUMBER_OF_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores greater than 1 .
  * 
@@ -186,29 +186,29 @@ void test_timeslice_verification_tasks_equal_priority( void )
  */
 void test_timeslice_verification_idle_core( void )
 {
-    TaskHandle_t xTaskHandles[configNUM_CORES] = { NULL };
+    TaskHandle_t xTaskHandles[configNUMBER_OF_CORES] = { NULL };
     uint32_t i;
 
-    /* Create configNUM_CORES tasks of equal priority */
-    for (i = 0; i < (configNUM_CORES - 1); i++) {
+    /* Create configNUMBER_OF_CORES tasks of equal priority */
+    for (i = 0; i < (configNUMBER_OF_CORES - 1); i++) {
         xTaskCreate( vSmpTestTask, "SMP Task", configMINIMAL_STACK_SIZE, NULL, 1, &xTaskHandles[i] );
     }
     
     vTaskStartScheduler();
 
     /* Verify all tasks are in the running state prior to incrementing a tick */
-    for (i = 0; i < configNUM_CORES -1 ; i++) {
+    for (i = 0; i < configNUMBER_OF_CORES -1 ; i++) {
         verifySmpTask( &xTaskHandles[i], eRunning, i );
     }
 
     /* Verify the idle task is running on the last CPU Core */
-    verifyIdleTask(0, (configNUM_CORES - 1));
+    verifyIdleTask(0, (configNUMBER_OF_CORES - 1));
 
     /* Verify all tasks remain in the running state each time a tick is incremented */
-    for (i = 0; i < configNUM_CORES ; i++) {
+    for (i = 0; i < configNUMBER_OF_CORES ; i++) {
         xTaskIncrementTick();
 
-        for (int j = 0; j < configNUM_CORES - 1; j++) {
+        for (int j = 0; j < configNUMBER_OF_CORES - 1; j++) {
             verifySmpTask( &xTaskHandles[j], eRunning, j );
         }
     }
@@ -224,7 +224,7 @@ void test_timeslice_verification_idle_core( void )
  * #define configRUN_MULTIPLE_PRIORITIES                    0
  * #define configUSE_TIME_SLICING                           1
  * #define configUSE_CORE_AFFINITY                          1
- * #define configNUM_CORES                                  (N > 1)
+ * #define configNUMBER_OF_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores greater than 1 .
  * 
@@ -248,11 +248,11 @@ void test_timeslice_verification_idle_core( void )
  */
 void test_timeslice_verification_different_priority_tasks( void )
 {
-    TaskHandle_t xTaskHandles[configNUM_CORES + 1] = { NULL };
+    TaskHandle_t xTaskHandles[configNUMBER_OF_CORES + 1] = { NULL };
     uint32_t i;
 
-    /* Create configNUM_CORES tasks of high priority */
-    for (i = 0; i < (configNUM_CORES); i++) {
+    /* Create configNUMBER_OF_CORES tasks of high priority */
+    for (i = 0; i < (configNUMBER_OF_CORES); i++) {
         xTaskCreate( vSmpTestTask, "SMP Task", configMINIMAL_STACK_SIZE, NULL, 2, &xTaskHandles[i] );
     }
     
@@ -262,23 +262,23 @@ void test_timeslice_verification_different_priority_tasks( void )
     vTaskStartScheduler();
 
     /* Verify all tasks are in the running state */
-    for (i = 0; i < configNUM_CORES; i++) {
+    for (i = 0; i < configNUMBER_OF_CORES; i++) {
         verifySmpTask( &xTaskHandles[i], eRunning, i );
     }
 
     /* The remaining task shall be in the ready state */
-    verifySmpTask( &xTaskHandles[configNUM_CORES], eReady, -1 );
+    verifySmpTask( &xTaskHandles[configNUMBER_OF_CORES], eReady, -1 );
 
     /* Verify all tasks remain in the running state each time a tick is incremented */
     /* The low priority task should never enter the running state */
-    for (i = 0; i < configNUM_CORES; i++) {
+    for (i = 0; i < configNUMBER_OF_CORES; i++) {
         xTaskIncrementTick();
         
-        for (int j = 0; j < configNUM_CORES; j++) {
+        for (int j = 0; j < configNUMBER_OF_CORES; j++) {
             verifySmpTask( &xTaskHandles[j], eRunning, j );
         }
 
-        verifySmpTask( &xTaskHandles[configNUM_CORES], eReady, -1 );
+        verifySmpTask( &xTaskHandles[configNUMBER_OF_CORES], eReady, -1 );
     }
 }
 
@@ -294,7 +294,7 @@ void test_timeslice_verification_different_priority_tasks( void )
  * #define configRUN_MULTIPLE_PRIORITIES                    0
  * #define configUSE_TIME_SLICING                           1
  * #define configUSE_CORE_AFFINITY                          1
- * #define configNUM_CORES                                  (N > 1)
+ * #define configNUMBER_OF_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores greater than 1 .
  * 
@@ -319,7 +319,7 @@ void test_timeslice_verification_different_priority_tasks( void )
  * Raise the priority of task TN + 1 and verify on each tick it executes on a
  * different CPU core
  * 
- * Task (TN + 1) when configNUM_CORES = 4
+ * Task (TN + 1) when configNUMBER_OF_CORES = 4
  * Tick    Core
  * 1       3
  * 2      -1
@@ -328,11 +328,11 @@ void test_timeslice_verification_different_priority_tasks( void )
  */
 void test_priority_change_tasks_different_priority_raise_to_equal( void )
 {
-    TaskHandle_t xTaskHandles[configNUM_CORES + 1] = { NULL };
+    TaskHandle_t xTaskHandles[configNUMBER_OF_CORES + 1] = { NULL };
     uint32_t i;
 
-    /* Create configNUM_CORES tasks of high priority */
-    for (i = 0; i < (configNUM_CORES); i++) {
+    /* Create configNUMBER_OF_CORES tasks of high priority */
+    for (i = 0; i < (configNUMBER_OF_CORES); i++) {
         xTaskCreate( vSmpTestTask, "SMP Task", configMINIMAL_STACK_SIZE, NULL, 2, &xTaskHandles[i] );
     }
 
@@ -342,43 +342,43 @@ void test_priority_change_tasks_different_priority_raise_to_equal( void )
     vTaskStartScheduler();
 
     /* Verify all tasks are in the running state */
-    for (i = 0; i < configNUM_CORES; i++) {
+    for (i = 0; i < configNUMBER_OF_CORES; i++) {
         verifySmpTask( &xTaskHandles[i], eRunning, i );
     }
 
     /* The remaining task shall be in the ready state */
-    verifySmpTask( &xTaskHandles[configNUM_CORES], eReady, -1 );
+    verifySmpTask( &xTaskHandles[configNUMBER_OF_CORES], eReady, -1 );
 
     /* Verify all tasks remain in the running state each time a tick is incremented */
     /* The low priority task should never enter the running state */
-    for (i = 0; i < configNUM_CORES; i++) {
+    for (i = 0; i < configNUMBER_OF_CORES; i++) {
         xTaskIncrementTick();
         
-        for (int j = 0; j < configNUM_CORES; j++) {
+        for (int j = 0; j < configNUMBER_OF_CORES; j++) {
             verifySmpTask( &xTaskHandles[j], eRunning, j );
         }
 
-        verifySmpTask( &xTaskHandles[configNUM_CORES], eReady, -1 );
+        verifySmpTask( &xTaskHandles[configNUMBER_OF_CORES], eReady, -1 );
     }
 
     /* Raise the priority of the low priority task to match the running tasks */
-    vTaskPrioritySet( xTaskHandles[configNUM_CORES], 2 );
+    vTaskPrioritySet( xTaskHandles[configNUMBER_OF_CORES], 2 );
 
     /* After the first tick the ready task will be running on the last CPU core */
-    int32_t core = (configNUM_CORES - 1);
+    int32_t core = (configNUMBER_OF_CORES - 1);
 
-    for (i = 0; i < configNUM_CORES; i++) {
+    for (i = 0; i < configNUMBER_OF_CORES; i++) {
         
         xTaskIncrementTick();
 
         /* Verify the last created task runs on each core or enters the ready state */
-        verifySmpTask( &xTaskHandles[configNUM_CORES], (core == -1) ? eReady : eRunning, core );
+        verifySmpTask( &xTaskHandles[configNUMBER_OF_CORES], (core == -1) ? eReady : eRunning, core );
 
         /* Track wrap around to the ready state */
-        if ((i % configNUM_CORES) == 0) {
+        if ((i % configNUMBER_OF_CORES) == 0) {
             core = -1;
         } else {
-            core = i % configNUM_CORES;
+            core = i % configNUMBER_OF_CORES;
         }
 
         if (core == 0) {
@@ -398,7 +398,7 @@ void test_priority_change_tasks_different_priority_raise_to_equal( void )
  * #define configRUN_MULTIPLE_PRIORITIES                    0
  * #define configUSE_TIME_SLICING                           1
  * #define configUSE_CORE_AFFINITY                          1
- * #define configNUM_CORES                                  (N > 1)
+ * #define configNUMBER_OF_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores greater than 1 .
  * 
@@ -417,7 +417,7 @@ void test_priority_change_tasks_different_priority_raise_to_equal( void )
  * Call xTaskIncrementTick() for each configured CPU core. The kernel will consider CPU 0
  * the core calling the API and therefore will not rotate tasks for that CPU.
  * 
- * Task (TN + 1) when configNUM_CORES = 4
+ * Task (TN + 1) when configNUMBER_OF_CORES = 4
  * Tick    Core
  * 1       1
  * 2       2
@@ -434,11 +434,11 @@ void test_priority_change_tasks_different_priority_raise_to_equal( void )
  */
 void test_priority_change_tasks_equal_priority( void )
 {
-    TaskHandle_t xTaskHandles[configNUM_CORES + 1] = { NULL };
+    TaskHandle_t xTaskHandles[configNUMBER_OF_CORES + 1] = { NULL };
     uint32_t i;
 
-    /* Create configNUM_CORES tasks of equal priority */
-    for (i = 0; i < (configNUM_CORES); i++) {
+    /* Create configNUMBER_OF_CORES tasks of equal priority */
+    for (i = 0; i < (configNUMBER_OF_CORES); i++) {
         xTaskCreate( vSmpTestTask, "SMP Task", configMINIMAL_STACK_SIZE, NULL, 2, &xTaskHandles[i] );
     }
     
@@ -448,48 +448,48 @@ void test_priority_change_tasks_equal_priority( void )
     vTaskStartScheduler();
     
     /* Verify all tasks are in the running state */
-    for (i = 0; i < configNUM_CORES; i++) {
+    for (i = 0; i < configNUMBER_OF_CORES; i++) {
         verifySmpTask( &xTaskHandles[i], eRunning, i );
     }
 
     /* The remaining task shall be in the ready state */
-    verifySmpTask( &xTaskHandles[configNUM_CORES], eReady, -1 );
+    verifySmpTask( &xTaskHandles[configNUMBER_OF_CORES], eReady, -1 );
 
     /* After the first tick the ready task will be running on CPU core 1 */
     int32_t core = 1;
 
-    for (i = 0; i < configNUM_CORES; i++) {
+    for (i = 0; i < configNUMBER_OF_CORES; i++) {
         
         xTaskIncrementTick();
 
         /* Verify the last created task runs on each core or enters the ready state */
-        verifySmpTask( &xTaskHandles[configNUM_CORES], (core == -1) ? eReady : eRunning, core );
+        verifySmpTask( &xTaskHandles[configNUMBER_OF_CORES], (core == -1) ? eReady : eRunning, core );
 
         /* Track wrap around to the ready state */
-        if ((i % configNUM_CORES) == (configNUM_CORES - 2)) {
+        if ((i % configNUMBER_OF_CORES) == (configNUMBER_OF_CORES - 2)) {
             core = -1;
         } else {
-            core = (i % configNUM_CORES) + 2;
+            core = (i % configNUMBER_OF_CORES) + 2;
         }
 
-        if ((i % configNUM_CORES) == (configNUM_CORES - 1)) {
+        if ((i % configNUMBER_OF_CORES) == (configNUMBER_OF_CORES - 1)) {
             core = 1;
         }
     }
 
     /* Lower the priority of task T0 */
-    vTaskPrioritySet( xTaskHandles[configNUM_CORES], 1 );
+    vTaskPrioritySet( xTaskHandles[configNUMBER_OF_CORES], 1 );
 
-    /* Verify all configNUM_CORES tasks are in the running state */
-    for (i = 0; i < configNUM_CORES; i++) {
+    /* Verify all configNUMBER_OF_CORES tasks are in the running state */
+    for (i = 0; i < configNUMBER_OF_CORES; i++) {
         xTaskIncrementTick();
         
-        for (int j = 0; j < configNUM_CORES; j++) {
+        for (int j = 0; j < configNUMBER_OF_CORES; j++) {
             verifySmpTask( &xTaskHandles[j], eRunning, j );
         }
 
         /* Verify the low priority task remains in the ready state */
-        verifySmpTask( &xTaskHandles[configNUM_CORES], eReady, -1 );
+        verifySmpTask( &xTaskHandles[configNUMBER_OF_CORES], eReady, -1 );
     }
 }
 
@@ -503,7 +503,7 @@ void test_priority_change_tasks_equal_priority( void )
  * #define configRUN_MULTIPLE_PRIORITIES                    0
  * #define configUSE_TIME_SLICING                           1
  * #define configUSE_CORE_AFFINITY                          1
- * #define configNUM_CORES                                  (N > 1)
+ * #define configNUMBER_OF_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores greater than 1 .
  * 
@@ -530,7 +530,7 @@ void test_priority_change_tasks_equal_priority( void )
  * Call xTaskIncrementTick() for each configured CPU core. The kernel will consider CPU 0
  * the core calling the API and therefore will not rotate tasks for that CPU.
  * 
- * Task (TN + 1) when configNUM_CORES = 4
+ * Task (TN + 1) when configNUMBER_OF_CORES = 4
  * Tick    Core
  * 1       -1
  * 2       1
@@ -539,46 +539,46 @@ void test_priority_change_tasks_equal_priority( void )
  */
 void test_task_create_tasks_equal_priority( void )
 {
-    TaskHandle_t xTaskHandles[configNUM_CORES + 1] = { NULL };
+    TaskHandle_t xTaskHandles[configNUMBER_OF_CORES + 1] = { NULL };
     uint32_t i;
 
-    /* Create configNUM_CORES tasks of equal priority */
-    for (i = 0; i < (configNUM_CORES); i++) {
+    /* Create configNUMBER_OF_CORES tasks of equal priority */
+    for (i = 0; i < (configNUMBER_OF_CORES); i++) {
         xTaskCreate( vSmpTestTask, "SMP Task", configMINIMAL_STACK_SIZE, NULL, 1, &xTaskHandles[i] );
     }
 
     vTaskStartScheduler();
 
     /* Verify all tasks remain in the running state each time a tick is incremented */
-    for (i = 0; i < configNUM_CORES; i++) {
+    for (i = 0; i < configNUMBER_OF_CORES; i++) {
         xTaskIncrementTick();
         
-        for (int j = 0; j < configNUM_CORES; j++) {
+        for (int j = 0; j < configNUMBER_OF_CORES; j++) {
             verifySmpTask( &xTaskHandles[j], eRunning, j );
         }
     } 
 
     /* Create a new task of equal priority */
-    xTaskCreate( vSmpTestTask, "SMP Task", configMINIMAL_STACK_SIZE, NULL, 1, &xTaskHandles[configNUM_CORES] );
+    xTaskCreate( vSmpTestTask, "SMP Task", configMINIMAL_STACK_SIZE, NULL, 1, &xTaskHandles[configNUMBER_OF_CORES] );
 
     /* The new task will begin in the ready state */
     int32_t core = -1;
 
     /* Verify the last created task runs on each core or enters the ready state */
-    for (i = 0; i < configNUM_CORES; i++) {
+    for (i = 0; i < configNUMBER_OF_CORES; i++) {
         
         xTaskIncrementTick();
 
-        verifySmpTask( &xTaskHandles[configNUM_CORES], (core == -1) ? eReady : eRunning, core );
+        verifySmpTask( &xTaskHandles[configNUMBER_OF_CORES], (core == -1) ? eReady : eRunning, core );
 
         /* Track wrap around to the ready state */
-        if ((i % configNUM_CORES) == (configNUM_CORES - 1)) {
+        if ((i % configNUMBER_OF_CORES) == (configNUMBER_OF_CORES - 1)) {
             core = -1;
         } else {
-            core = (i % configNUM_CORES) + 1;
+            core = (i % configNUMBER_OF_CORES) + 1;
         }
 
-        if ((i % configNUM_CORES) == 0) {
+        if ((i % configNUMBER_OF_CORES) == 0) {
             core = 1;
         }
     }
@@ -594,7 +594,7 @@ void test_task_create_tasks_equal_priority( void )
  * #define configRUN_MULTIPLE_PRIORITIES                    0
  * #define configUSE_TIME_SLICING                           1
  * #define configUSE_CORE_AFFINITY                          1
- * #define configNUM_CORES                                  (N > 1)
+ * #define configNUMBER_OF_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores greater than 1 .
  * 
@@ -627,33 +627,33 @@ void test_task_create_tasks_equal_priority( void )
  */
 void test_task_create_tasks_lower_priority( void )
 {
-    TaskHandle_t xTaskHandles[configNUM_CORES + 1] = { NULL };
+    TaskHandle_t xTaskHandles[configNUMBER_OF_CORES + 1] = { NULL };
     uint32_t i;
 
-    /* Create configNUM_CORES tasks of equal priority */
-    for (i = 0; i < (configNUM_CORES); i++) {
+    /* Create configNUMBER_OF_CORES tasks of equal priority */
+    for (i = 0; i < (configNUMBER_OF_CORES); i++) {
         xTaskCreate( vSmpTestTask, "SMP Task", configMINIMAL_STACK_SIZE, NULL, 2, &xTaskHandles[i] );
     }
 
     vTaskStartScheduler();
 
     /* Verify all tasks remain in the running state each time a tick is incremented */
-    for (i = 0; i < configNUM_CORES; i++) {
+    for (i = 0; i < configNUMBER_OF_CORES; i++) {
         xTaskIncrementTick();
         
-        for (int j = 0; j < configNUM_CORES; j++) {
+        for (int j = 0; j < configNUMBER_OF_CORES; j++) {
             verifySmpTask( &xTaskHandles[j], eRunning, j );
         }
     } 
 
     /* Create a new low priority task */
-    xTaskCreate( vSmpTestTask, "SMP Task", configMINIMAL_STACK_SIZE, NULL, 1, &xTaskHandles[configNUM_CORES] );
+    xTaskCreate( vSmpTestTask, "SMP Task", configMINIMAL_STACK_SIZE, NULL, 1, &xTaskHandles[configNUMBER_OF_CORES] );
 
     /* Verify all tasks remain in the running state each time a tick is incremented */
-    for (i = 0; i < configNUM_CORES; i++) {
+    for (i = 0; i < configNUMBER_OF_CORES; i++) {
         xTaskIncrementTick();
         
-        for (int j = 0; j < configNUM_CORES; j++) {
+        for (int j = 0; j < configNUMBER_OF_CORES; j++) {
             verifySmpTask( &xTaskHandles[j], eRunning, j );
         }
     } 
@@ -670,7 +670,7 @@ void test_task_create_tasks_lower_priority( void )
  * #define configRUN_MULTIPLE_PRIORITIES                    0
  * #define configUSE_TIME_SLICING                           1
  * #define configUSE_CORE_AFFINITY                          1
- * #define configNUM_CORES                                  (N > 1)
+ * #define configNUMBER_OF_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores greater than 1 .
  * 
@@ -689,7 +689,7 @@ void test_task_create_tasks_lower_priority( void )
  * Call xTaskIncrementTick() for each configured CPU core. The kernel will consider CPU 0
  * the core calling the API and therefore will not rotate tasks for that CPU.
  * 
- * Task (TN + 1) when configNUM_CORES = 4
+ * Task (TN + 1) when configNUMBER_OF_CORES = 4
  * Tick    Core
  * 1       1
  * 2       2
@@ -703,11 +703,11 @@ void test_task_create_tasks_lower_priority( void )
  */
 void test_task_delete_tasks_equal_priorities_delete_running_task( void )
 {
-    TaskHandle_t xTaskHandles[configNUM_CORES + 1] = { NULL };
+    TaskHandle_t xTaskHandles[configNUMBER_OF_CORES + 1] = { NULL };
     uint32_t i;
 
-    /* Create configNUM_CORES tasks of equal priority */
-    for (i = 0; i < (configNUM_CORES); i++) {
+    /* Create configNUMBER_OF_CORES tasks of equal priority */
+    for (i = 0; i < (configNUMBER_OF_CORES); i++) {
         xTaskCreate( vSmpTestTask, "SMP Task", configMINIMAL_STACK_SIZE, NULL, 2, &xTaskHandles[i] );
     }
 
@@ -717,43 +717,43 @@ void test_task_delete_tasks_equal_priorities_delete_running_task( void )
     vTaskStartScheduler();
 
     /* Verify all tasks are in the running state */
-    for (i = 0; i < configNUM_CORES; i++) {
+    for (i = 0; i < configNUMBER_OF_CORES; i++) {
         verifySmpTask( &xTaskHandles[i], eRunning, i );
     }
 
     /* The remaining task shall be in the ready state */
-    verifySmpTask( &xTaskHandles[configNUM_CORES], eReady, -1 );
+    verifySmpTask( &xTaskHandles[configNUMBER_OF_CORES], eReady, -1 );
 
     /* After the first tick the ready task will be running on CPU core 1 */
     int32_t core = 1;
 
-    for (i = 0; i < configNUM_CORES; i++) {
+    for (i = 0; i < configNUMBER_OF_CORES; i++) {
         
         xTaskIncrementTick();
 
         /* Verify the last created task runs on each core or enters the ready state */
-        verifySmpTask( &xTaskHandles[configNUM_CORES], (core == -1) ? eReady : eRunning, core );
+        verifySmpTask( &xTaskHandles[configNUMBER_OF_CORES], (core == -1) ? eReady : eRunning, core );
 
         /* Track wrap around to the ready state */
-        if ((i % configNUM_CORES) == (configNUM_CORES - 2)) {
+        if ((i % configNUMBER_OF_CORES) == (configNUMBER_OF_CORES - 2)) {
             core = -1;
         } else {
-            core = (i % configNUM_CORES) + 2;
+            core = (i % configNUMBER_OF_CORES) + 2;
         }
 
-        if ((i % configNUM_CORES) == (configNUM_CORES - 1)) {
+        if ((i % configNUMBER_OF_CORES) == (configNUMBER_OF_CORES - 1)) {
             core = 1;
         }
     }
 
     /* Delete last task */
-    vTaskDelete(xTaskHandles[configNUM_CORES]);
+    vTaskDelete(xTaskHandles[configNUMBER_OF_CORES]);
 
-    /* Verify all configNUM_CORES tasks are in the running state */
-    for (i = 0; i < configNUM_CORES; i++) {
+    /* Verify all configNUMBER_OF_CORES tasks are in the running state */
+    for (i = 0; i < configNUMBER_OF_CORES; i++) {
         xTaskIncrementTick();
         
-        for (int j = 0; j < configNUM_CORES; j++) {
+        for (int j = 0; j < configNUMBER_OF_CORES; j++) {
             verifySmpTask( &xTaskHandles[j], eRunning, j );
         }
     } 
@@ -771,7 +771,7 @@ void test_task_delete_tasks_equal_priorities_delete_running_task( void )
  * #define configRUN_MULTIPLE_PRIORITIES                    0
  * #define configUSE_TIME_SLICING                           1
  * #define configUSE_CORE_AFFINITY                          1
- * #define configNUM_CORES                                  (N > 1)
+ * #define configNUMBER_OF_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores greater than 1 .
  * 
@@ -790,7 +790,7 @@ void test_task_delete_tasks_equal_priorities_delete_running_task( void )
  * Call xTaskIncrementTick() for each configured CPU core. The kernel will consider CPU 0
  * the core calling the API and therefore will not rotate tasks for that CPU.
  * 
- * Task (TN + 1) when configNUM_CORES = 4
+ * Task (TN + 1) when configNUMBER_OF_CORES = 4
  * Tick    Core
  * 1       1
  * 2       2
@@ -805,11 +805,11 @@ void test_task_delete_tasks_equal_priorities_delete_running_task( void )
  */
 void test_task_suspend_running_task( void )
 {
-    TaskHandle_t xTaskHandles[configNUM_CORES + 1] = { NULL };
+    TaskHandle_t xTaskHandles[configNUMBER_OF_CORES + 1] = { NULL };
     uint32_t i;
 
-    /* Create configNUM_CORES tasks of equal priority */
-    for (i = 0; i < (configNUM_CORES); i++) {
+    /* Create configNUMBER_OF_CORES tasks of equal priority */
+    for (i = 0; i < (configNUMBER_OF_CORES); i++) {
         xTaskCreate( vSmpTestTask, "SMP Task", configMINIMAL_STACK_SIZE, NULL, 2, &xTaskHandles[i] );
     }
 
@@ -819,66 +819,66 @@ void test_task_suspend_running_task( void )
     vTaskStartScheduler();
     
     /* Verify all tasks are in the running state */
-    for (i = 0; i < configNUM_CORES; i++) {
+    for (i = 0; i < configNUMBER_OF_CORES; i++) {
         verifySmpTask( &xTaskHandles[i], eRunning, i );
     }
 
     /* The remaining task shall be in the ready state */
-    verifySmpTask( &xTaskHandles[configNUM_CORES], eReady, -1 );
+    verifySmpTask( &xTaskHandles[configNUMBER_OF_CORES], eReady, -1 );
 
     /* After the first tick the ready task will be running on CPU core 1 */
     int32_t core = 1;
 
-    for (i = 0; i < configNUM_CORES; i++) {
+    for (i = 0; i < configNUMBER_OF_CORES; i++) {
         
         xTaskIncrementTick();
 
         /* Verify the last created task runs on each core or enters the ready state */
-        verifySmpTask( &xTaskHandles[configNUM_CORES], (core == -1) ? eReady : eRunning, core );
+        verifySmpTask( &xTaskHandles[configNUMBER_OF_CORES], (core == -1) ? eReady : eRunning, core );
 
         /* Track wrap around to the ready state */
-        if ((i % configNUM_CORES) == (configNUM_CORES - 2)) {
+        if ((i % configNUMBER_OF_CORES) == (configNUMBER_OF_CORES - 2)) {
             core = -1;
         } else {
-            core = (i % configNUM_CORES) + 2;
+            core = (i % configNUMBER_OF_CORES) + 2;
         }
 
-        if ((i % configNUM_CORES) == (configNUM_CORES - 1)) {
+        if ((i % configNUMBER_OF_CORES) == (configNUMBER_OF_CORES - 1)) {
             core = 1;
         }
     }
 
     /* Suspend last task */
-    vTaskSuspend(xTaskHandles[configNUM_CORES]);
+    vTaskSuspend(xTaskHandles[configNUMBER_OF_CORES]);
 
     /* Verify all tasks remain in the running state each time a tick is incremented */
-    for (i = 0; i < configNUM_CORES; i++) {
+    for (i = 0; i < configNUMBER_OF_CORES; i++) {
         xTaskIncrementTick();
         
-        for (int j = 0; j < configNUM_CORES; j++) {
+        for (int j = 0; j < configNUMBER_OF_CORES; j++) {
             verifySmpTask( &xTaskHandles[j], eRunning, j );
         }
     }
 
     /* Resume suspended task */
-    vTaskResume(xTaskHandles[configNUM_CORES]);
+    vTaskResume(xTaskHandles[configNUMBER_OF_CORES]);
 
     /* After the first tick the ready task will be running on the last CPU core */
-    core = (configNUM_CORES -1);
+    core = (configNUMBER_OF_CORES -1);
 
-    for (i = 0; i < configNUM_CORES; i++) {
+    for (i = 0; i < configNUMBER_OF_CORES; i++) {
     
         xTaskIncrementTick();
 
-        verifySmpTask( &xTaskHandles[configNUM_CORES], (core == -1) ? eReady : eRunning, core );
+        verifySmpTask( &xTaskHandles[configNUMBER_OF_CORES], (core == -1) ? eReady : eRunning, core );
 
-        if ((i % configNUM_CORES) == 0) {
+        if ((i % configNUMBER_OF_CORES) == 0) {
             core = -1;
         } else {
-            core = (i % configNUM_CORES);
+            core = (i % configNUMBER_OF_CORES);
         }
 
-        if ((i % configNUM_CORES) == configNUM_CORES) {
+        if ((i % configNUMBER_OF_CORES) == configNUMBER_OF_CORES) {
             core = 1;
         }
     }
@@ -895,7 +895,7 @@ void test_task_suspend_running_task( void )
  * #define configRUN_MULTIPLE_PRIORITIES                    0
  * #define configUSE_TIME_SLICING                           1
  * #define configUSE_CORE_AFFINITY                          1
- * #define configNUM_CORES                                  (N > 1)
+ * #define configNUMBER_OF_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores greater than 1 .
  * 
@@ -914,7 +914,7 @@ void test_task_suspend_running_task( void )
  * Call xTaskIncrementTick() for each configured CPU core. The kernel will consider
  * CPU 0 the core calling the API and therefore will not rotate tasks for that CPU.
  * 
- * Task (TN + 1) when configNUM_CORES = 4
+ * Task (TN + 1) when configNUMBER_OF_CORES = 4
  * Tick    Core
  * 1       1
  * 2       2
@@ -928,11 +928,11 @@ void test_task_suspend_running_task( void )
  */
 void test_task_block_running_task( void )
 {
-    TaskHandle_t xTaskHandles[configNUM_CORES + 1] = { NULL };
+    TaskHandle_t xTaskHandles[configNUMBER_OF_CORES + 1] = { NULL };
     uint32_t i;
 
-    /* Create configNUM_CORES tasks of equal priority */
-    for (i = 0; i < (configNUM_CORES); i++) {
+    /* Create configNUMBER_OF_CORES tasks of equal priority */
+    for (i = 0; i < (configNUMBER_OF_CORES); i++) {
         xTaskCreate( vSmpTestTask, "SMP Task", configMINIMAL_STACK_SIZE, NULL, 2, &xTaskHandles[i] );
     }
 
@@ -942,43 +942,43 @@ void test_task_block_running_task( void )
     vTaskStartScheduler();
 
     /* Verify all tasks are in the running state */
-    for (i = 0; i < configNUM_CORES; i++) {
+    for (i = 0; i < configNUMBER_OF_CORES; i++) {
         verifySmpTask( &xTaskHandles[i], eRunning, i );
     }
 
     /* The remaining task shall be in the ready state */
-    verifySmpTask( &xTaskHandles[configNUM_CORES], eReady, -1 );
+    verifySmpTask( &xTaskHandles[configNUMBER_OF_CORES], eReady, -1 );
 
     /* After the first tick the ready task will be running on CPU core 1 */
     int32_t core = 1;
 
-    for (i = 0; i < configNUM_CORES; i++) {
+    for (i = 0; i < configNUMBER_OF_CORES; i++) {
         
         xTaskIncrementTick();
 
         /* Verify the last created task runs on each core or enters the ready state */
-        verifySmpTask( &xTaskHandles[configNUM_CORES], (core == -1) ? eReady : eRunning, core );
+        verifySmpTask( &xTaskHandles[configNUMBER_OF_CORES], (core == -1) ? eReady : eRunning, core );
 
         /* Track wrap around to the ready state */
-        if ((i % configNUM_CORES) == (configNUM_CORES - 2)) {
+        if ((i % configNUMBER_OF_CORES) == (configNUMBER_OF_CORES - 2)) {
             core = -1;
         } else {
-            core = (i % configNUM_CORES) + 2;
+            core = (i % configNUMBER_OF_CORES) + 2;
         }
 
-        if ((i % configNUM_CORES) == (configNUM_CORES - 1)) {
+        if ((i % configNUMBER_OF_CORES) == (configNUMBER_OF_CORES - 1)) {
             core = 1;
         }
     }
 
     /* Block last task */
-    vTaskDelay(configNUM_CORES);
+    vTaskDelay(configNUMBER_OF_CORES);
 
-    /* Verify all configNUM_CORES tasks are in the running state */
-    for (i = 0; i < configNUM_CORES; i++) {
+    /* Verify all configNUMBER_OF_CORES tasks are in the running state */
+    for (i = 0; i < configNUMBER_OF_CORES; i++) {
         xTaskIncrementTick();
         
-        for (int j = 1; j < configNUM_CORES -1 ; j++) {
+        for (int j = 1; j < configNUMBER_OF_CORES -1 ; j++) {
             verifySmpTask( &xTaskHandles[j], eRunning, j );
         }
     }
@@ -995,7 +995,7 @@ void test_task_block_running_task( void )
  * #define configRUN_MULTIPLE_PRIORITIES                    0
  * #define configUSE_TIME_SLICING                           1
  * #define configUSE_CORE_AFFINITY                          1
- * #define configNUM_CORES                                  (N > 1)
+ * #define configNUMBER_OF_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores greater than 1 .
  * 
@@ -1016,7 +1016,7 @@ void test_task_block_running_task( void )
  * Call xTaskIncrementTick() for each configured CPU core. The kernel will consider
  * CPU 0 the core calling the API and therefore will not rotate tasks for that CPU.
  * 
- * Task (TN + 1) when configNUM_CORES = 4
+ * Task (TN + 1) when configNUMBER_OF_CORES = 4
  * Tick    Core
  * 1       3
  * 2       -1
@@ -1026,35 +1026,35 @@ void test_task_block_running_task( void )
  */
 void test_task_affinity_verification( void )
 {
-    TaskHandle_t xTaskHandles[configNUM_CORES + 1] = { NULL };
+    TaskHandle_t xTaskHandles[configNUMBER_OF_CORES + 1] = { NULL };
     uint32_t i;
 
-    /* Create configNUM_CORES tasks of equal priority */
-    for (i = 0; i < (configNUM_CORES); i++) {
+    /* Create configNUMBER_OF_CORES tasks of equal priority */
+    for (i = 0; i < (configNUMBER_OF_CORES); i++) {
         xTaskCreate( vSmpTestTask, "SMP Task", configMINIMAL_STACK_SIZE, NULL, 2, &xTaskHandles[i] );
     }
         
     /* Create a single equal priority task with core affinity for the last CPU core */
-    xTaskCreateAffinitySet( vSmpTestTask, "SMP Task", configMINIMAL_STACK_SIZE, NULL, 2, (1 << (configNUM_CORES - 1)), &xTaskHandles[i] );
+    xTaskCreateAffinitySet( vSmpTestTask, "SMP Task", configMINIMAL_STACK_SIZE, NULL, 2, (1 << (configNUMBER_OF_CORES - 1)), &xTaskHandles[i] );
 
     vTaskStartScheduler();
 
     /* Verify all tasks are in the running state */
-    for (i = 0; i < configNUM_CORES; i++) {
+    for (i = 0; i < configNUMBER_OF_CORES; i++) {
         verifySmpTask( &xTaskHandles[i], eRunning, i );
     }
 
     /* The remaining task shall be in the ready state */
-    verifySmpTask( &xTaskHandles[configNUM_CORES], eReady, -1 );
+    verifySmpTask( &xTaskHandles[configNUMBER_OF_CORES], eReady, -1 );
 
-    for (i = 0; i < configNUM_CORES; i++) {
+    for (i = 0; i < configNUMBER_OF_CORES; i++) {
         
         xTaskIncrementTick();
 
         /* Verify the task is either in the ready state or running on the last CPU core */
-        int32_t core = (i % 2 == 0) ? (configNUM_CORES - 1) : -1;
+        int32_t core = (i % 2 == 0) ? (configNUMBER_OF_CORES - 1) : -1;
 
-        verifySmpTask( &xTaskHandles[configNUM_CORES], (core == -1) ? eReady : eRunning, core );
+        verifySmpTask( &xTaskHandles[configNUMBER_OF_CORES], (core == -1) ? eReady : eRunning, core );
     }
 }
 
@@ -1070,7 +1070,7 @@ void test_task_affinity_verification( void )
  * #define configRUN_MULTIPLE_PRIORITIES                    0
  * #define configUSE_TIME_SLICING                           1
  * #define configUSE_CORE_AFFINITY                          1
- * #define configNUM_CORES                                  (N > 1)
+ * #define configNUMBER_OF_CORES                                  (N > 1)
  * 
  * This test can be run with FreeRTOS configured for any number of cores greater than 1 .
  * 
@@ -1091,7 +1091,7 @@ void test_task_affinity_verification( void )
  * Call xTaskIncrementTick() for each configured CPU core. The kernel will consider
  * CPU 0 the core calling the API and therefore will not rotate tasks for that CPU.
  * 
- * Task (TN + 1) when configNUM_CORES = 4
+ * Task (TN + 1) when configNUMBER_OF_CORES = 4
  * Tick    Core
  * 1       1
  * 2       2
@@ -1107,7 +1107,7 @@ void test_task_affinity_verification( void )
  * 
  * Verify the task only runs on the specified core or is in the ready state.
  * 
- * Task (TN + 1) when configNUM_CORES = 4
+ * Task (TN + 1) when configNUMBER_OF_CORES = 4
  * Tick    Core
  * 1       3
  * 2      -1
@@ -1116,11 +1116,11 @@ void test_task_affinity_verification( void )
  */
 void test_task_affinity_set_affinity_running_task( void )
 {
-    TaskHandle_t xTaskHandles[configNUM_CORES + 1] = { NULL };
+    TaskHandle_t xTaskHandles[configNUMBER_OF_CORES + 1] = { NULL };
     uint32_t i;
 
-    /* Create configNUM_CORES tasks of equal priority */
-    for (i = 0; i < (configNUM_CORES); i++) {
+    /* Create configNUMBER_OF_CORES tasks of equal priority */
+    for (i = 0; i < (configNUMBER_OF_CORES); i++) {
         xTaskCreate( vSmpTestTask, "SMP Task", configMINIMAL_STACK_SIZE, NULL, 2, &xTaskHandles[i] );
     }
 
@@ -1130,45 +1130,45 @@ void test_task_affinity_set_affinity_running_task( void )
     vTaskStartScheduler();
 
     /* Verify all tasks are in the running state */
-    for (i = 0; i < configNUM_CORES; i++) {
+    for (i = 0; i < configNUMBER_OF_CORES; i++) {
         verifySmpTask( &xTaskHandles[i], eRunning, i );
     }
 
     /* The remaining task shall be in the ready state */
-    verifySmpTask( &xTaskHandles[configNUM_CORES], eReady, -1 );
+    verifySmpTask( &xTaskHandles[configNUMBER_OF_CORES], eReady, -1 );
 
     /* After the first tick the ready task will be running on CPU core 1 */
     int32_t core = 1;
 
-    for (i = 0; i < configNUM_CORES; i++) {
+    for (i = 0; i < configNUMBER_OF_CORES; i++) {
         
         xTaskIncrementTick();
 
         /* Verify the last created task runs on each core or enters the ready state */
-        verifySmpTask( &xTaskHandles[configNUM_CORES], (core == -1) ? eReady : eRunning, core );
+        verifySmpTask( &xTaskHandles[configNUMBER_OF_CORES], (core == -1) ? eReady : eRunning, core );
 
         /* Track wrap around to the ready state */
-        if ((i % configNUM_CORES) == (configNUM_CORES - 2)) {
+        if ((i % configNUMBER_OF_CORES) == (configNUMBER_OF_CORES - 2)) {
             core = -1;
         } else {
-            core = (i % configNUM_CORES) + 2;
+            core = (i % configNUMBER_OF_CORES) + 2;
         }
 
-        if ((i % configNUM_CORES) == (configNUM_CORES - 1)) {
+        if ((i % configNUMBER_OF_CORES) == (configNUMBER_OF_CORES - 1)) {
             core = 1;
         }
     }
 
     /* Set CPU core affinity on the last task for the last CPU core */
-    vTaskCoreAffinitySet(xTaskHandles[configNUM_CORES], 1 << ((configNUM_CORES - 1)) );
+    vTaskCoreAffinitySet(xTaskHandles[configNUMBER_OF_CORES], 1 << ((configNUMBER_OF_CORES - 1)) );
 
-    for (i = 0; i < configNUM_CORES; i++) {
+    for (i = 0; i < configNUMBER_OF_CORES; i++) {
         
         xTaskIncrementTick();
 
         /* Verify the task is either in the ready state or running on the last CPU core */
-        core = (i % 2 == 0) ? (configNUM_CORES - 1) : -1 ;
+        core = (i % 2 == 0) ? (configNUMBER_OF_CORES - 1) : -1 ;
 
-        verifySmpTask( &xTaskHandles[configNUM_CORES], (core == -1) ? eReady : eRunning, core );
+        verifySmpTask( &xTaskHandles[configNUMBER_OF_CORES], (core == -1) ? eReady : eRunning, core );
     }
 }
