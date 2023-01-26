@@ -43,7 +43,7 @@
 
 /* SMP test specific configuration */
 #define configRUN_MULTIPLE_PRIORITIES                    0
-#define configNUMBER_OF_CORES                            16
+#define configNUMBER_OF_CORES                            4
 #define configUSE_CORE_AFFINITY                          1
 #define configUSE_TIME_SLICING                           1
 #define configUSE_TASK_PREEMPTION_DISABLE                0

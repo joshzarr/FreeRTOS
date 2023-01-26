@@ -332,7 +332,8 @@ void verifySmpTask( TaskHandle_t * xTaskHandle, eTaskState eCurrentState, TaskRu
     TaskStatus_t xTaskDetails;
 
     vTaskGetInfo(*xTaskHandle, &xTaskDetails, pdTRUE, eInvalid );
-    TEST_ASSERT_EQUAL_INT_MESSAGE( xTaskRunState, xTaskDetails.xHandle->xTaskRunState, "Task Verification Failed: Incorrect xTaskRunState" );
+    //printf("xTaskDetails.xHandle->xTaskRunState: %ld, xTaskRunState: %ld \n", xTaskDetails.xHandle->xTaskRunState, xTaskRunState);
+    TEST_ASSERT_EQUAL_INT_MESSAGE(xTaskRunState, xTaskDetails.xHandle->xTaskRunState, "Task Verification Failed: Incorrect xTaskRunState");
     TEST_ASSERT_EQUAL_INT_MESSAGE( eCurrentState, xTaskDetails.eCurrentState, "Task Verification Failed: Incorrect eCurrentState" );
 }
 
@@ -347,4 +348,25 @@ void verifyIdleTask( BaseType_t index, TaskRunning_t xTaskRunState)
     TEST_ASSERT_EQUAL_INT_MESSAGE( pdTRUE, xTaskDetails.xHandle->uxTaskAttributes, "Idle Task Verification Failed: Incorrect xIsIdle" );
     TEST_ASSERT_EQUAL_INT_MESSAGE( xTaskRunState, xTaskDetails.xHandle->xTaskRunState, "Idle Task Verification Failed: Incorrect xTaskRunState" );
     TEST_ASSERT_EQUAL_INT_MESSAGE( eRunning, xTaskDetails.eCurrentState, "Idle Task Verification Failed: Incorrect eCurrentState" );
+}
+
+/* Helper function to simulate calling xTaskIncrementTick in critical section. */
+void xTaskIncrementTick_helper( void )
+{
+    BaseType_t xSwitchRequired;
+    UBaseType_t uxSavedInterruptState;
+
+    /* xTaskIncrementTick is called in ISR context. Use taskENTER/EXIT_CRITICAL_FROM_ISR
+     * here. */
+    uxSavedInterruptState = taskENTER_CRITICAL_FROM_ISR();
+
+    xSwitchRequired = xTaskIncrementTick();
+
+    /* Simulate context switch on the core which calls xTaskIncrementTick. */
+    if( xSwitchRequired == pdTRUE )
+    {
+        portYIELD_CORE( configTICK_CORE );
+    }
+
+    taskEXIT_CRITICAL_FROM_ISR( uxSavedInterruptState );
 }
