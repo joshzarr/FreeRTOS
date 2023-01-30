@@ -65,7 +65,6 @@ extern volatile TickType_t xTickCount;
 extern volatile UBaseType_t uxTopReadyPriority;
 extern volatile BaseType_t xSchedulerRunning;
 extern volatile TickType_t xPendedTicks;
-
 #if ( defined( configNUMBER_OF_CORES ) && ( configNUMBER_OF_CORES == 1 ) )
     extern volatile BaseType_t xYieldPendings[];
     #define xYieldPending   xYieldPendings[ 0 ]
