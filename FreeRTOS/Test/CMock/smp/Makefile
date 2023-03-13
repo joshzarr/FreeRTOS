@@ -6,6 +6,7 @@ include ../makefile.in
 
 # SUITES lists the suites contained in subdirectories of this directory
 SUITES	+=	single_priority_no_timeslice
+SUITES  +=  multiple_priorities_timeslice
 
 # PROJECT and SUITE variables are determined based on path like so:
 #   $(UT_ROOT_DIR)/$(PROJECT)/$(SUITE)
