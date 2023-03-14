@@ -2379,10 +2379,10 @@ void test_task_affinity_resume_suspended_task( void )
  * 
  * Remove core affinity on the new task
  * 
- * Task (T0)	             Task (TN)                 Task (TN + 1)
- * Priority – 2              Priority – 1              Priority – 2
- * Affinity – None           Affinity – None           Affinity – None
- * State – Running (Core 0)  State – Ready             State – Running (Last Core)
+ * Task (T0)                 Task (TN - 1)             Task (TN)                 Task (TN + 1)
+ * Priority – 2              Priority – 1              Priority – 1              Priority – 2
+ * Affinity – None           Affinity – None           Affinity – None           Affinity – None
+ * State – Running (Core 0)  State – Running           State – Ready             State – Running (Last Core)
  */
 void test_task_affinity_modify_affinity( void )
 {
