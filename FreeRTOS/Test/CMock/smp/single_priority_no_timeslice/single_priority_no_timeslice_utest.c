@@ -453,7 +453,7 @@ void test_priority_change_tasks_different_priority_lower( void )
     /* Verify the task remains running. */
     /* When priority dropped in prvSelectHighestPriorityTask, all the idle cores
      * will yield for context switch. The ready queue is a FIFO. Core 0 will choose
-     * The first task in the ready queue which is task 1. Task 0 will be choosed
+     * The first task in the ready queue which is task 1. Task 0 will be selected
      * by the last core which calls context switch.
      * Core 0 choose xTaskHandles[1]
      * Core 1 choose xTaskHandles[2]
