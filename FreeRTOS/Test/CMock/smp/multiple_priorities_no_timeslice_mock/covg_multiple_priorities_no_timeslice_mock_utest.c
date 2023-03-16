@@ -85,6 +85,11 @@
 /* ============================  GLOBAL VARIABLES =========================== */
 
 /**
+ * @brief Global idle task name pointer.
+ */
+const char * pcIdleTaskName = NULL;
+
+/**
  * @brief Global counter for the number of assertions in code.
  */
 static int assertionFailed = 1;
@@ -1106,13 +1111,15 @@ void test_prvGetExpectedIdleTime_top_ready_prio_gt_idle_prio_current_prio_lt_idl
  *
  * configNMBER_OF_CORES > 1
  */
-void test_prvCreateIdleTasks_name_too_long( void )
+void test_prvCreateIdleTasks_name_within_max_len( void )
 {
     BaseType_t prvCreateIdleTasks( void );
 
     TCB_t * xIdleTask;
     TCB_t xTask = { 0 };
     int i;
+
+    pcIdleTaskName = "IDLE longXX";
 
     for( i = 0; i < configNUMBER_OF_CORES; i++ )
     {
@@ -1149,6 +1156,71 @@ void test_prvCreateIdleTasks_name_too_long( void )
         xIdleTaskHandles[ i ] = NULL;
     }
 }
+
+/**
+ * @brief This test ensures that when we call prvCreateIdleTasks with and idle
+ *        name that is longer than  configMAX_TASK_NAME_LEN the name is
+ *        truncated to configMAX_TASK_NAME_LEN
+ *
+ * <b>Coverage</b>
+ * @code{c}
+ * prvCreateIdleTasks();
+ *
+ * if( x < configMAX_TASK_NAME_LEN )
+ *
+ * @endcode
+ *
+ * configNMBER_OF_CORES > 1
+ */
+void test_prvCreateIdleTasks_name_too_long( void )
+{
+    BaseType_t prvCreateIdleTasks( void );
+
+    TCB_t xTask = { 0 };
+    TCB_t * xIdleTask;
+    int i;
+
+    pcIdleTaskName = "IDLE long name";
+
+    uxCurrentNumberOfTasks = 2;
+
+    for( i = 0; i < configNUMBER_OF_CORES; i++ )
+    {
+        pxCurrentTCBs[ i ] = &xTask;
+    }
+
+    for( i = 0; i < configNUMBER_OF_CORES; i++ )
+    {
+        /* prvInitialiseNewTask */
+        vListInitialiseItem_ExpectAnyArgs();
+        vListInitialiseItem_ExpectAnyArgs();
+        listSET_LIST_ITEM_VALUE_ExpectAnyArgs();
+        pxPortInitialiseStack_ExpectAnyArgsAndReturn( NULL );
+        vFakePortEnterCriticalSection_Expect();
+        listINSERT_END_ExpectAnyArgs();
+        portSetupTCB_CB_ExpectAnyArgs();
+        vFakePortGetCoreID_ExpectAndReturn( 0 );
+        vFakePortExitCriticalSection_Expect();
+    }
+
+    prvCreateIdleTasks();
+
+    xIdleTask = ( TCB_t * ) xIdleTaskHandles[ 0 ];
+
+    /* Test Verifications */
+    TEST_ASSERT_EQUAL_STRING_LEN( configIDLE_TASK_NAME,
+                                  xIdleTask->pcTaskName,
+                                  configMAX_TASK_NAME_LEN - 1 );
+
+    /* Clean up idle task. */
+    for( i = 0; i < configNUMBER_OF_CORES; i++ )
+    {
+        vPortFreeStack( xIdleTaskHandles[ i ]->pxStack );
+        vPortFree( xIdleTaskHandles[ i ] );
+        xIdleTaskHandles[ i ] = NULL;
+    }
+}
+
 
 /**
  * @brief This test ensures that if the scheduler is not running, and the

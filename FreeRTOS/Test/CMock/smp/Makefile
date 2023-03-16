@@ -10,11 +10,10 @@ SUITES	+=	single_priority_timeslice
 SUITES	+=	multiple_priorities_no_timeslice
 SUITES	+=	multiple_priorities_timeslice
 
-# mock SUITES for coverage test
+# SUITS mock dependency source for coverage test
 SUITES	+=	multiple_priorities_no_timeslice_mock
-SUITES	+=	multiple_priorities_long_idle_name_mock
 
-# config assert SUITES
+# SUITS for configASSERT
 SUITES	+=	config_assert
 
 # PROJECT and SUITE variables are determined based on path like so:
