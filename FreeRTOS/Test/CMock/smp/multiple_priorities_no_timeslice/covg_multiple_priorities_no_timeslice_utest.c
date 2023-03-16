@@ -1589,6 +1589,99 @@ void test_coverage_prvSelectHighestPriorityTask_affinity_preemption_disabled( vo
 }
 
 /**
+ * @brief prvSelectHighestPriorityTask - task with preemption enabled.
+ *
+ * prvSelectHighestPriorityTask selects a task to run on specified core. The scheduler
+ * also selects another core to yield for previous task if the condition is satisfied.
+ * This test verifies the coverage of preemption enabled condition.
+ *
+ * <b>Coverage</b>
+ * @code{c}
+ * if( ( xTaskPriority < xLowestPriority ) &&
+ *     ( taskTASK_IS_RUNNING( pxCurrentTCBs[ uxCore ] ) != pdFALSE ) &&
+ *     ( xYieldPendings[ uxCore ] == pdFALSE ) )
+ * {
+ *     #if ( configUSE_TASK_PREEMPTION_DISABLE == 1 )
+ *         if( pxCurrentTCBs[ uxCore ]->xPreemptionDisable == pdFALSE )
+ *     #endif
+ *     {
+ *         xLowestPriority = xTaskPriority;
+ *         xLowestPriorityCore = uxCore;
+ *     }
+ * }
+ * @endcode
+ * ( pxCurrentTCBs[ uxCore ]->xPreemptionDisable == pdFALSE ) is true.
+ */
+void test_coverage_prvSelectHighestPriorityTask_affinity_preemption_enabled( void )
+{
+    TCB_t xTaskTCBs[ configNUMBER_OF_CORES + 2 ] = { 0 };
+    uint32_t i = 0;
+
+    /* Setup the variables and structure. */
+    /* Initialize the idle priority ready list and set top ready priority to higher
+     * priority than idle. */
+    vListInitialise( &( pxReadyTasksLists[ tskIDLE_PRIORITY ] ) );
+    vListInitialise( &( pxReadyTasksLists[ tskIDLE_PRIORITY + 1 ] ) );
+    uxTopReadyPriority = tskIDLE_PRIORITY + 1;
+    uxCurrentNumberOfTasks = 0;
+
+    /* Create core numbers running idle task. */
+    for( i = 0; i < configNUMBER_OF_CORES; i++ )
+    {
+        vCreateStaticTestTask( &xTaskTCBs[ i ],
+                              ( ( 1U << configNUMBER_OF_CORES ) - 1U ),
+                              tskIDLE_PRIORITY,
+                              i,
+                              pdTRUE );
+        listINSERT_END( &pxReadyTasksLists[ tskIDLE_PRIORITY ], &xTaskTCBs[ i ].xStateListItem );
+    }
+
+    /* Create two higher priority normal task. */
+    for( i = configNUMBER_OF_CORES; i < ( configNUMBER_OF_CORES + 2 ); i++ )
+    {
+        vCreateStaticTestTask( &xTaskTCBs[ i ],
+                               ( ( 1U << configNUMBER_OF_CORES ) - 1U ),
+                               tskIDLE_PRIORITY + 1,
+                               taskTASK_NOT_RUNNING,
+                               pdFALSE );
+        listINSERT_END( &pxReadyTasksLists[ tskIDLE_PRIORITY + 1 ], &xTaskTCBs[ i ].xStateListItem );
+    }
+
+    /* Core 0 runs task TN. The original core 0 idle task now is not running. */
+    xTaskTCBs[ 0 ].xTaskRunState = taskTASK_NOT_RUNNING;
+    pxCurrentTCBs[ 0 ] = &xTaskTCBs[ configNUMBER_OF_CORES ];
+    xTaskTCBs[ configNUMBER_OF_CORES ].xTaskRunState = 0;
+
+    /* Task 1 has preemption disabled. */
+    xTaskTCBs[ 1 ].xPreemptionDisable = pdFALSE;
+
+    /* Setup the affinity mask for TN and TN+1. */
+    xTaskTCBs[ configNUMBER_OF_CORES ].uxCoreAffinityMask = ( 1 << 0 ) | ( 1 << 1 );
+    xTaskTCBs[ configNUMBER_OF_CORES + 1 ].uxCoreAffinityMask = ( 1 << 0 );
+
+    /* The ready list has the following status.
+     * Ready list [ 0 ] : T0, T1(preemption enabled), T2(2), ..., TN-1(N-1).
+     * Ready list [ 1 ] : TN(0), TN+1. */
+
+    vFakePortYieldCore_StubWithCallback( NULL );
+    vFakePortYieldCore_Expect( 1 );
+
+    /* API calls. Select task for core 0. Task TN+1 will be selected. Scheduler
+     * tries to find another core to yield for TN. The affinity mask limited the
+     * core for TN to run on core 1 only ( core 0 is running TN+1 ). Idle task 1 has
+     * preemption enabled. Therefore, core 1 will yield for TN. Task 1 will be of
+     * yielding state. */
+    prvSelectHighestPriorityTask( 0 );
+
+    /* Validations.*/
+    /* T0 won't be selected to run after calling prvSelectHighestPriorityTask since
+     * it can only runs on core 0 and core 1. Task on core 1 is yielding. */
+    TEST_ASSERT_NOT_EQUAL( &xTaskTCBs[ 0 ], pxCurrentTCBs[ 0 ] );
+    /* T1 will be requested to yield. */
+    TEST_ASSERT_NOT_EQUAL( taskTASK_YIELDING, xTaskTCBs[ 1 ].xTaskRunState );
+}
+
+/**
  * @brief xTaskRemoveFromEventList - Remove a equal priority task from event list.
  *
  * The task is removed from event list. Verified this task is put back to ready list 
