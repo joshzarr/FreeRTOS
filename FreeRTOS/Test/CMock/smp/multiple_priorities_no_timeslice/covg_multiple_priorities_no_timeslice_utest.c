@@ -1678,7 +1678,7 @@ void test_coverage_prvSelectHighestPriorityTask_affinity_preemption_enabled( voi
      * it can only runs on core 0 and core 1. Task on core 1 is yielding. */
     TEST_ASSERT_NOT_EQUAL( &xTaskTCBs[ 0 ], pxCurrentTCBs[ 0 ] );
     /* T1 will be requested to yield. */
-    TEST_ASSERT_NOT_EQUAL( taskTASK_YIELDING, xTaskTCBs[ 1 ].xTaskRunState );
+    TEST_ASSERT_EQUAL( taskTASK_YIELDING, xTaskTCBs[ 1 ].xTaskRunState );
 }
 
 /**
