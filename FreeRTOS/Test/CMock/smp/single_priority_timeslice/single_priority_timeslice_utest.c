@@ -76,8 +76,13 @@ int suiteTearDown( int numFailures )
     return numFailures;
 }
 
+/* =============================  HELPER FUNCTIONS  ========================= */
+void vApplicationMinimalIdleHook( void )
+{
+    /* Adding this function to pass compilation. */
+}
 
-/* ==============================  Test Cases  ============================== */
+/* ==============================  Test Cases  ============================== */    
 
 /**
  * @brief AWS_IoT-FreeRTOS_SMP_TC-75
