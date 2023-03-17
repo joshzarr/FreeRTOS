@@ -88,7 +88,7 @@
 /**
  * @brief Global idle task name pointer.
  */
-const char * pcIdleTaskName = NULL;
+const char * pcIdleTaskName = "IDLE";
 
 /**
  * @brief Global counter for the number of assertions in code.
