@@ -8,5 +8,4 @@ StackType_t * pxPortInitialiseStack( StackType_t * pxTopOfStack,
 BaseType_t xPortStartScheduler( void );
 
 void vPortEndScheduler( void );
-
-#endif
+#endif /* LOCAL_PORTABLE_H */

@@ -54,6 +54,7 @@
 #include "mock_local_portable.h"
 
 /* =================================  MACROS  =============================== */
+
 /**
  * @brief CException code for when a configASSERT should be intercepted.
  */
@@ -105,7 +106,7 @@ extern volatile UBaseType_t uxDeletedTasksWaitingCleanUp;
 extern volatile UBaseType_t xSchedulerRunning;
 extern volatile BaseType_t xYieldPendings[ configNUMBER_OF_CORES ];
 extern volatile TCB_t * pxCurrentTCBs[ configNUMBER_OF_CORES ];
-extern TaskHandle_t xIdleTaskHandles[configNUMBER_OF_CORES];
+extern TaskHandle_t xIdleTaskHandles[ configNUMBER_OF_CORES ];
 extern volatile BaseType_t xYieldForTask;
 extern volatile BaseType_t xYieldRequired;
 extern volatile UBaseType_t uxCurrentNumberOfTasks;
