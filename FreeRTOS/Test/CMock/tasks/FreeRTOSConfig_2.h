@@ -128,7 +128,10 @@ void vConfigureTimerForRunTimeStats( void );    /* Prototype of function that in
 
 /* It is a good idea to define configASSERT() while developing.  configASSERT()
  * uses the same semantics as the standard C assert() macro. */
-#define configASSERT( x ) do {  if( x ) { vFakeAssert( true, __FILE__, __LINE__ );  } else { vFakeAssert( false, __FILE__, __LINE__ ); } } while( 0 )
+#define configASSERT( x )                                     \
+    do { if( x ) { vFakeAssert( true, __FILE__, __LINE__ ); } \
+         else { vFakeAssert( false, __FILE__, __LINE__ ); }   \
+    } while( 0 )
 
 #define portREMOVE_STATIC_QUALIFIER                  1
 #define configUSE_LIST_DATA_INTEGRITY_CHECK_BYTES    0
