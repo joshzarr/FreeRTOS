@@ -23,7 +23,7 @@
  * https://github.com/FreeRTOS
  *
  */
-/*! @file multiple_priorities_no_timeslice_utest.c */
+/*! @file covg_multiple_priorities_no_timeslice_utest.c */
 
 /* C runtime includes. */
 #include <stdlib.h>
@@ -31,7 +31,7 @@
 #include <stdint.h>
 #include <string.h>
 
-/* Tasl includes */
+/* Tasks includes */
 #include "FreeRTOS.h"
 #include "FreeRTOSConfig.h"
 #include "event_groups.h"
@@ -40,18 +40,18 @@
 /* Test includes. */
 #include "unity.h"
 #include "unity_memory.h"
+#include "CException.h"
 #include "../global_vars.h"
 #include "../smp_utest_common.h"
 #include <assert.h>
 
 /* Mock includes. */
 #include "mock_timers.h"
-#include "mock_fake_assert.h"
-#include "mock_fake_port.h"
 #include "mock_list.h"
 #include "mock_list_macros.h"
+#include "mock_fake_assert.h"
+#include "mock_fake_port.h"
 #include "mock_local_portable.h"
-
 
 /* =================================  MACROS  =============================== */
 /**
@@ -209,7 +209,7 @@ void vPortFree( void * pv )
  * @endcode
  * ( xSchedulerRunning != pdFALSE ) is false.
  */
-void test_vTaskSuspend_scheduler_running_false( void )
+void test_coverage_vTaskSuspend_scheduler_running_false( void )
 {
     TCB_t xTaskTCBs[ 1 ] = { NULL };
 
@@ -247,7 +247,7 @@ void test_vTaskSuspend_scheduler_running_false( void )
  * ( taskTASK_IS_RUNNING( pxTCB ) ) is false.
  */
 
-void test_vTaskSuspend_running_state_below_range( void )
+void test_coverage_vTaskSuspend_running_state_below_range( void )
 {
     TCB_t xTaskTCBs[ 1 ] = { NULL };
 
@@ -285,7 +285,7 @@ void test_vTaskSuspend_running_state_below_range( void )
  * ( taskTASK_IS_RUNNING( pxTCB ) ) is false.
  */
 
-void test_vTaskSuspend_running_state_above_range( void )
+void test_coverage_vTaskSuspend_running_state_above_range( void )
 {
     TCB_t xTaskTCBs[ 1 ] = { NULL };
 
@@ -321,7 +321,7 @@ void test_vTaskSuspend_running_state_above_range( void )
  * @endcode
  * ( taskTASK_IS_RUNNING( pxTCB ) ) is false.
  */
-void test_vTaskPrioritySet_non_running_state( void )
+void test_coverage_vTaskPrioritySet_non_running_state( void )
 {
     TCB_t xTaskTCBs[ 1 ] = { NULL };
 
@@ -358,7 +358,7 @@ void test_vTaskPrioritySet_non_running_state( void )
  * @endcode
  * ( pxTCB->xPreemptionDisable == pdFALSE ) is false.
  */
-void test_vTaskPrioritySet_running_state( void )
+void test_coverage_vTaskPrioritySet_running_state( void )
 {
     TCB_t xTaskTCBs[ 1 ] = { NULL };
 
@@ -549,7 +549,7 @@ void test_coverage_vTaskDelete_scheduler_not_running( void )
  * configNMBER_OF_CORES > 1
  * INCLUDE_vTaskDelete = 1
  */
-void test_vTaskDelete_task_not_running( void )
+void test_coverage_vTaskDelete_task_not_running( void )
 {
     TCB_t task;
     TaskHandle_t xTaskToDelete;
@@ -599,7 +599,7 @@ void test_vTaskDelete_task_not_running( void )
  * configUSE_TRACE_FACILITY = 1
  * INCLUDE_xTaskAbortDelay = 1
  */
-void test_eTaskGetState_task_not_running( void )
+void test_coverage_eTaskGetState_task_not_running( void )
 {
     TCB_t task = { 0 };
     TaskHandle_t xTask = &task;
@@ -639,7 +639,7 @@ void test_eTaskGetState_task_not_running( void )
  * INCLUDE_xTaskGetCurrentTaskHandle = 1
  * configUSE_MUTEXES = 1
  */
-void test_vTaskPreemptionDisable_null_handle( void )
+void test_coverage_vTaskPreemptionDisable_null_handle( void )
 {
     TCB_t xTask = { 0 };
 
@@ -674,7 +674,7 @@ void test_vTaskPreemptionDisable_null_handle( void )
  *
  * configNMBER_OF_CORES > 1
  */
-void test_vTaskSuspendAll_critical_nesting_ne_zero( void )
+void test_coverage_vTaskSuspendAll_critical_nesting_ne_zero( void )
 {
     TCB_t xTask = { 0 };
 
@@ -716,7 +716,7 @@ void test_vTaskSuspendAll_critical_nesting_ne_zero( void )
  * configUSE_TICKLESS_IDLE != 0
  * configUSE_PORT_OPTIMISED_TASK_SELECTION = 0
  */
-void test_prvGetExpectedIdleTime_top_priority_gt_idle_prio( void )
+void test_coverage_prvGetExpectedIdleTime_top_priority_gt_idle_prio( void )
 {
     CEXCEPTION_T e = CEXCEPTION_NONE;
     TCB_t xTCB = { 0 };
@@ -786,7 +786,7 @@ void test_prvGetExpectedIdleTime_top_priority_gt_idle_prio( void )
  * configUSE_TICKLESS_IDLE != 0
  * configUSE_PORT_OPTIMISED_TASK_SELECTION = 0
  */
-void test_prvGetExpectedIdleTime_ready_list_gt_one( void )
+void test_coverage_prvGetExpectedIdleTime_ready_list_gt_one( void )
 {
     CEXCEPTION_T e = CEXCEPTION_NONE;
     TCB_t xTCB = { 0 };
@@ -854,7 +854,7 @@ void test_prvGetExpectedIdleTime_ready_list_gt_one( void )
  * configUSE_TICKLESS_IDLE != 0
  * configUSE_PORT_OPTIMISED_TASK_SELECTION = 0
  */
-void test_prvGetExpectedIdleTime_ready_list_eq_1( void )
+void test_coverage_prvGetExpectedIdleTime_ready_list_eq_1( void )
 {
     CEXCEPTION_T e = CEXCEPTION_NONE;
     TCB_t xTCB = { 0 };
@@ -953,7 +953,7 @@ void port_assert_if_isr_cb( int num_callbacks )
  * configUSE_TICKLESS_IDLE != 0
  * configUSE_PORT_OPTIMISED_TASK_SELECTION = 0
  */
-void test_prvGetExpectedIdleTime_ready_list_eq_2( void )
+void test_coverage_prvGetExpectedIdleTime_ready_list_eq_2( void )
 {
     CEXCEPTION_T e = CEXCEPTION_NONE;
     TCB_t xTCB = { 0 };
@@ -1045,7 +1045,7 @@ void test_prvGetExpectedIdleTime_ready_list_eq_2( void )
  * configUSE_TICKLESS_IDLE != 0
  * configUSE_PORT_OPTIMISED_TASK_SELECTION = 0
  */
-void test_prvGetExpectedIdleTime_top_ready_prio_gt_idle_prio_current_prio_lt_idle( void )
+void test_coverage_prvGetExpectedIdleTime_top_ready_prio_gt_idle_prio_current_prio_lt_idle( void )
 {
     CEXCEPTION_T e = CEXCEPTION_NONE;
     TCB_t xTCB = { 0 };
@@ -1111,7 +1111,7 @@ void test_prvGetExpectedIdleTime_top_ready_prio_gt_idle_prio_current_prio_lt_idl
  *
  * configNMBER_OF_CORES > 1
  */
-void test_prvCreateIdleTasks_name_within_max_len( void )
+void test_coverage_prvCreateIdleTasks_name_within_max_len( void )
 {
     BaseType_t prvCreateIdleTasks( void );
 
@@ -1172,7 +1172,7 @@ void test_prvCreateIdleTasks_name_within_max_len( void )
  *
  * configNMBER_OF_CORES > 1
  */
-void test_prvCreateIdleTasks_name_too_long( void )
+void test_coverage_prvCreateIdleTasks_name_too_long( void )
 {
     BaseType_t prvCreateIdleTasks( void );
 
@@ -1239,7 +1239,7 @@ void test_prvCreateIdleTasks_name_too_long( void )
  * INCLUDE_xTaskGetSchedulerState = 1
  * configUSE_TIMERS = 1
  */
-void test_xTaskGetSchedulerState_scheduler_not_running_and_suspended( void )
+void test_coverage_xTaskGetSchedulerState_scheduler_not_running_and_suspended( void )
 {
     BaseType_t xRet;
 
@@ -1268,7 +1268,7 @@ void test_xTaskGetSchedulerState_scheduler_not_running_and_suspended( void )
  * configNMBER_OF_CORES > 1
  * configUSE_TASK_NOTIFICATIONS = 1
  */
-void test_ulTaskGenericNotifyTake( void )
+void test_coverage_ulTaskGenericNotifyTake( void )
 {
     uint32_t ulRet;
     TCB_t xTask = { 0 };
@@ -1349,7 +1349,7 @@ void test_ulTaskGenericNotifyTake( void )
  * configUSE_TASK_NOTIFICATIONS = 1
  */
 /* configUSE_TASK_NOTIFICATIONS  */
-void test_xTaskGenericNotifyWait( void )
+void test_coverage_xTaskGenericNotifyWait( void )
 {
     UBaseType_t uxIndexToWait = 1;
     uint32_t ulBitsToClearOnEntry = pdTRUE;
