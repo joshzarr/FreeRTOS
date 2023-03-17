@@ -147,7 +147,11 @@ static void vFakeAssertStub( bool x,
 /*! called before each testcase */
 void setUp( void )
 {
+    /* Reset the idle task name to default value. */
+    pcIdleTaskName = "IDLE";
+
     vFakeAssert_StubWithCallback( vFakeAssertStub );
+
     UnityMalloc_StartTest();
 }
 
