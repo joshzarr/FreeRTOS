@@ -59,11 +59,11 @@ extern volatile TickType_t xPendedTicks;
 extern volatile BaseType_t xNumOfOverflows;
 extern volatile TickType_t xNextTaskUnblockTime;
 extern UBaseType_t uxTaskNumber;
-extern TaskHandle_t xIdleTaskHandles[configNUMBER_OF_CORES];
+extern TaskHandle_t xIdleTaskHandles[ configNUMBER_OF_CORES ];
 extern volatile UBaseType_t uxSchedulerSuspended;
 extern volatile UBaseType_t uxDeletedTasksWaitingCleanUp;
 extern List_t * volatile pxDelayedTaskList;
-extern volatile TCB_t *  pxCurrentTCBs[ configNUMBER_OF_CORES ];
+extern volatile TCB_t * pxCurrentTCBs[ configNUMBER_OF_CORES ];
 
 static BaseType_t xCoreYields[ configNUMBER_OF_CORES ] = { 0 };
 
@@ -98,8 +98,8 @@ void vPortFree( void * pv )
 }
 
 StackType_t * pxPortInitialiseStack( StackType_t * pxTopOfStack,
-                                             TaskFunction_t pxCode,
-                                             void * pvParameters )
+                                     TaskFunction_t pxCode,
+                                     void * pvParameters )
 {
     return pxTopOfStack;
 }
@@ -109,8 +109,9 @@ BaseType_t xPortStartScheduler( void )
     uint8_t i;
 
     /* Initialize each core with a task */
-    for (i = 0; i < configNUMBER_OF_CORES; i++) {
-        vTaskSwitchContext(i);
+    for( i = 0; i < configNUMBER_OF_CORES; i++ )
+    {
+        vTaskSwitchContext( i );
     }
 
     return pdTRUE;
@@ -118,10 +119,10 @@ BaseType_t xPortStartScheduler( void )
 
 void vPortEndScheduler( void )
 {
-    return;
 }
 
-void vFakePortYieldCoreStubCallback( int xCoreID, int cmock_num_calls )
+void vFakePortYieldCoreStubCallback( int xCoreID,
+                                     int cmock_num_calls )
 {
     BaseType_t xCoreInCritical = pdFALSE;
     BaseType_t xPreviousCoreId = xCurrentCoreId;
@@ -142,7 +143,9 @@ void vFakePortYieldCoreStubCallback( int xCoreID, int cmock_num_calls )
         /* If a is in the critical section, pend the core yield until the
          * task spinlock is released. */
         xCoreYields[ xCoreID ] = pdTRUE;
-    } else {
+    }
+    else
+    {
         /* No task is in the critical section. We can yield this core. */
         xCurrentCoreId = xCoreID;
         vTaskSwitchContext( xCurrentCoreId );
@@ -192,12 +195,13 @@ static void vYieldCores( void )
             vTaskSwitchContext( i );
         }
     }
+
     xCurrentCoreId = xPreviousCoreId;
 }
 
 unsigned int vFakePortGetCoreID( void )
 {
-    return ( unsigned int )xCurrentCoreId;
+    return ( unsigned int ) xCurrentCoreId;
 }
 
 void vFakePortGetISRLock( void )
@@ -255,6 +259,7 @@ void vFakePortReleaseTaskLock( void )
 UBaseType_t vFakePortEnterCriticalFromISR( void )
 {
     UBaseType_t uxSavedInterruptState;
+
     uxSavedInterruptState = vTaskEnterCriticalFromISR();
     return uxSavedInterruptState;
 }
@@ -270,8 +275,7 @@ void vFakePortExitCriticalFromISR( UBaseType_t uxSavedInterruptState )
 
 void commonSetUp( void )
 {
-
-    vFakePortYieldCore_StubWithCallback( vFakePortYieldCoreStubCallback) ;
+    vFakePortYieldCore_StubWithCallback( vFakePortYieldCoreStubCallback );
     vFakePortYield_StubWithCallback( vFakePortYieldStubCallback );
 
     vFakeAssert_Ignore();
@@ -283,20 +287,20 @@ void commonSetUp( void )
 
     vFakePortGetTaskLock_Ignore();
     vFakePortGetISRLock_Ignore();
-    vFakePortDisableInterrupts_IgnoreAndReturn(1);
+    vFakePortDisableInterrupts_IgnoreAndReturn( 1 );
     vFakePortRestoreInterrupts_Ignore();
-    xTimerCreateTimerTask_IgnoreAndReturn(1);
-    vFakePortCheckIfInISR_IgnoreAndReturn(0);
+    xTimerCreateTimerTask_IgnoreAndReturn( 1 );
+    vFakePortCheckIfInISR_IgnoreAndReturn( 0 );
     vPortCurrentTaskDying_Ignore();
     portSetupTCB_CB_Ignore();
-    ulFakePortSetInterruptMask_IgnoreAndReturn(0);
+    ulFakePortSetInterruptMask_IgnoreAndReturn( 0 );
     vFakePortClearInterruptMask_Ignore();
 
     memset( &pxReadyTasksLists, 0x00, configMAX_PRIORITIES * sizeof( List_t ) );
     memset( &xDelayedTaskList1, 0x00, sizeof( List_t ) );
     memset( &xDelayedTaskList2, 0x00, sizeof( List_t ) );
-    memset( &xIdleTaskHandles, 0x00, (configNUMBER_OF_CORES * sizeof( TaskHandle_t )) );
-    memset( &pxCurrentTCBs, 0x00, (configNUMBER_OF_CORES * sizeof( TCB_t * )) );
+    memset( &xIdleTaskHandles, 0x00, ( configNUMBER_OF_CORES * sizeof( TaskHandle_t ) ) );
+    memset( &pxCurrentTCBs, 0x00, ( configNUMBER_OF_CORES * sizeof( TCB_t * ) ) );
 
     uxDeletedTasksWaitingCleanUp = 0;
     uxCurrentNumberOfTasks = ( UBaseType_t ) 0U;
@@ -318,30 +322,32 @@ void commonSetUp( void )
 
 void commonTearDown( void )
 {
-
 }
 
 /* ==========================  Helper functions =========================== */
 
-void vSmpTestTask( void *pvParameters )
+void vSmpTestTask( void * pvParameters )
 {
 }
 
-void verifySmpTask( TaskHandle_t * xTaskHandle, eTaskState eCurrentState, TaskRunning_t xTaskRunState)
+void verifySmpTask( TaskHandle_t * xTaskHandle,
+                    eTaskState eCurrentState,
+                    TaskRunning_t xTaskRunState )
 {
     TaskStatus_t xTaskDetails;
 
-    vTaskGetInfo(*xTaskHandle, &xTaskDetails, pdTRUE, eInvalid );
+    vTaskGetInfo( *xTaskHandle, &xTaskDetails, pdTRUE, eInvalid );
     TEST_ASSERT_EQUAL_INT_MESSAGE( xTaskRunState, xTaskDetails.xHandle->xTaskRunState, "Task Verification Failed: Incorrect xTaskRunState" );
     TEST_ASSERT_EQUAL_INT_MESSAGE( eCurrentState, xTaskDetails.eCurrentState, "Task Verification Failed: Incorrect eCurrentState" );
 }
 
-void verifyIdleTask( BaseType_t index, TaskRunning_t xTaskRunState)
+void verifyIdleTask( BaseType_t index,
+                     TaskRunning_t xTaskRunState )
 {
     TaskStatus_t xTaskDetails;
     int ret;
 
-    vTaskGetInfo(xIdleTaskHandles[index], &xTaskDetails, pdTRUE, eInvalid );
+    vTaskGetInfo( xIdleTaskHandles[ index ], &xTaskDetails, pdTRUE, eInvalid );
     ret = strncmp( xTaskDetails.xHandle->pcTaskName, "IDLE", 4 );
     TEST_ASSERT_EQUAL_INT_MESSAGE( 0, ret, "Idle Task Verification Failed: Incorrect task name" );
     TEST_ASSERT_EQUAL_INT_MESSAGE( pdTRUE, xTaskDetails.xHandle->uxTaskAttributes, "Idle Task Verification Failed: Incorrect xIsIdle" );

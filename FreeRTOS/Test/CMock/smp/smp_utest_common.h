@@ -73,18 +73,20 @@ void commonTearDown( void );
 /**
  * @brief Verify task current and run states
  */
-void verifySmpTask( TaskHandle_t * xTaskHandle, eTaskState eCurrentState, 
-                        TaskRunning_t xTaskRunState);
+void verifySmpTask( TaskHandle_t * xTaskHandle,
+                    eTaskState eCurrentState,
+                    TaskRunning_t xTaskRunState );
 
 /**
  * @brief Verify the Idle task is executing on a specific core
  */
-void verifyIdleTask( BaseType_t index, TaskRunning_t xTaskRunState);
+void verifyIdleTask( BaseType_t index,
+                     TaskRunning_t xTaskRunState );
 
 /**
  * @brief Dummy task for test execution
  */
-void vSmpTestTask( void *pvParameters );
+void vSmpTestTask( void * pvParameters );
 
 /**
  * @brief Helper function to simulate calling xTaskIncrementTick in critical section.
