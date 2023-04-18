@@ -431,7 +431,7 @@ void test_priority_change_tasks_different_priority_raise_to_equal( void )
  * Priority – 2               Priority – 1
  * State - Running (Core N)   State - Ready
  */
-void test_priority_change_tasks_equal_priority( void )
+void test_priority_change_tasks_equal_priority_lower_ready_task( void )
 {
     TaskHandle_t xTaskHandles[ configNUMBER_OF_CORES + 1 ] = { NULL };
     uint32_t i;
