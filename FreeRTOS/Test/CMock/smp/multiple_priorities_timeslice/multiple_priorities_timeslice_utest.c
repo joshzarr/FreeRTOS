@@ -887,7 +887,7 @@ void test_task_create_tasks_lower_priority( void )
 
 /**
  * @brief AWS_IoT-FreeRTOS_SMP_TC-102
- * A high priority task will be created for each available CPU core. This test will
+ * A low priority task will be created for each available CPU core. This test will
  * verify that as OS ticks are generated all tasks will execute on a fixed CPU core.
  * A new high priority task will be created. The test will then verify the new task
  * is running and remain tasks rotate on cores.
