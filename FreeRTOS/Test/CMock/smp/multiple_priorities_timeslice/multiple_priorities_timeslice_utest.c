@@ -143,12 +143,19 @@ void test_timeslice_verification_tasks_equal_priority( void )
 
     /* Generate a tick for each configNUMBER_OF_CORES. This will cause each
      * task to be either moved to the ready state or the running state */
-    for( i = 0; i < configNUMBER_OF_CORES; i++ )
+    for( i = 0; i <= configNUMBER_OF_CORES; i++ )
     {
         xTaskIncrementTick_helper();
 
         /* Verify the last created task runs on each core or enters the ready state */
-        verifySmpTask( &xTaskHandles[ configNUMBER_OF_CORES ], eRunning, i );
+        if( i < configNUMBER_OF_CORES )
+        {
+            verifySmpTask( &xTaskHandles[ configNUMBER_OF_CORES ], eRunning, i );
+        }
+        else
+        {
+            verifySmpTask( &xTaskHandles[ configNUMBER_OF_CORES ], eReady, -1 );
+        }
     }
 }
 
@@ -225,7 +232,7 @@ void test_timeslice_verification_idle_core( void )
  * will verify that as OS ticks are generated all CPU cores will remain running
  * their original tasks and the ready task never enters the running state.
  *
- * #define configRUN_MULTIPLE_PRIORITIES                    0
+ * #define configRUN_MULTIPLE_PRIORITIES                    1
  * #define configUSE_TIME_SLICING                           1
  * #define configUSE_CORE_AFFINITY                          1
  * #define configNUMBER_OF_CORES                            (N > 1)
@@ -944,7 +951,7 @@ void test_task_create_tasks_higher_priority( void )
         }
     }
 
-    /* Create a new low priority task */
+    /* Create a new high priority task */
     xTaskCreate( vSmpTestTask, "SMP Task", configMINIMAL_STACK_SIZE, NULL, 2, &xTaskHandles[ configNUMBER_OF_CORES ] );
 
     /* Verify the created task is running on the last core. */
